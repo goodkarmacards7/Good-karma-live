@@ -1,5 +1,5 @@
 window.GOOD_KARMA_CONFIG = {
-  sheetId: "PASTE_YOUR_GOOGLE_SHEET_ID_HERE",
+  sheetId: "1893dQvXUL_8ltl9zem8ygiHIUfo4pzui3q2ceQsmNW4",
 
   // The gid numbers for the two tabs in your Google Sheet.
   hitsGid: "0",
