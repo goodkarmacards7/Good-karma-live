@@ -3,7 +3,7 @@ window.GOOD_KARMA_CONFIG = {
 
   // The gid numbers for the two tabs in your Google Sheet.
   hitsGid: "0",
-  statsGid: "0",
+  statsGid: "1803586008",
 
   refreshSeconds: 10,
   celebrationSeconds: 6,
