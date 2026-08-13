@@ -1,34 +1,85 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Good Karma Cards | Live Mystery Pack Board</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Good Karma Cards | Live Good Karma Pulls</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand"><div class="logo">GK</div><div><div class="eyebrow">GOOD KARMA CARDS</div><h1>LIVE MYSTERY PACK BOARD</h1><p id="streamNote">Every pack contains an Illustration Rare or better.</p></div></div>
-  <div class="stats">
-    <div><span id="premiumValue">$0</span><small>Premium Value Left</small></div>
-    <div><span id="highestChase">$0</span><small>Highest Chase</small></div>
-    <div><span id="packsRemaining">0</span><small>Packs Remaining</small></div>
-    <div><span id="liveHitsCount">0</span><small>Premium Hits Left</small></div>
+  <main class="stream-display">
+    <header class="stream-header">
+      <div class="brand-lockup">
+        <div class="logo">GK</div>
+        <div>
+          <div class="eyebrow">GOOD KARMA CARDS</div>
+          <h1>GOOD KARMA PULLS</h1>
+        </div>
+      </div>
+      <div class="live-pill"><span class="live-dot"></span> LIVE HITS</div>
+    </header>
+
+    <section class="featured-stage" aria-live="polite">
+      <div class="featured-image-wrap">
+        <img id="featuredImage" class="featured-image" alt="Featured premium hit">
+        <div id="featuredTier" class="tier-badge"></div>
+      </div>
+
+      <div class="featured-copy">
+        <div class="featured-label">FEATURED HIT</div>
+        <h2 id="featuredName">Loading premium hits...</h2>
+        <div class="featured-meta-row">
+          <span id="featuredNumber" class="featured-number"></span>
+          <strong id="featuredValue" class="featured-value"></strong>
+        </div>
+        <div class="rotation-progress"><div id="rotationProgress"></div></div>
+        <div id="hitCounter" class="hit-counter"></div>
+      </div>
+    </section>
+
+    <footer class="stream-footer">
+      <div class="footer-box price-box">
+        <span class="footer-label">PER PULL</span>
+        <strong>$12</strong>
+      </div>
+      <div class="footer-box">
+        <span class="footer-label">CHOOSE</span>
+        <strong>A • B • C</strong>
+      </div>
+      <div class="footer-box">
+        <span class="footer-label">PACKS LEFT</span>
+        <strong id="packsRemaining">0</strong>
+      </div>
+      <div class="footer-box guarantee-box">
+        <span class="footer-label">EVERY PULL</span>
+        <strong>IR OR BETTER</strong>
+      </div>
+    </footer>
+
+    <div class="status-line">
+      <span id="connectionDot" class="connection-dot"></span>
+      <span id="connectionText">Connecting...</span>
+      <span class="divider">•</span>
+      <span id="lastUpdated"></span>
+    </div>
+  </main>
+
+  <div id="celebration" class="celebration" hidden>
+    <div class="confetti"></div>
+    <div class="celebration-box">
+      <div class="jackpot">JACKPOT HIT!</div>
+      <img id="celebrationImage" alt="">
+      <h2 id="celebrationName"></h2>
+      <div id="celebrationValue"></div>
+      <p id="celebrationWinner"></p>
+      <small>GOOD KARMA CARDS</small>
+    </div>
   </div>
-</header>
-<main class="layout">
-  <aside>
-    <section class="panel"><div class="label">Hit Progress</div><div class="meter-copy"><b id="meterText">0 / 0 left</b><span id="meterPercent">0%</span></div><div class="meter"><div id="meterFill"></div></div><div id="meterDots" class="dots"></div></section>
-    <section class="panel"><div class="label">Latest Premium Hit</div><div id="recentHit" class="recent">Waiting for the first pull...</div></section>
-    <section class="panel mini"><div><span>Packs Sold</span><b id="packsSold">0</b></div><div><span>Premium Hits Pulled</span><b id="hitsPulled">0</b></div><div><span>Total Premium Hits</span><b id="totalHits">0</b></div></section>
-    <section class="panel qr"><img src="live-board-qr.png" alt="QR code"><div><b>SCAN THE LIVE BOARD</b><span>See every premium hit still available.</span></div></section>
-    <section class="panel"><div class="connection"><i id="connectionDot"></i><span id="connectionText">Loading...</span></div><small id="lastUpdated"></small></section>
-  </aside>
-  <section class="board"><div class="board-head"><div><div class="label">CURRENTLY IN THE GAME</div><h2>Premium Hits</h2></div><label><input id="showPulled" type="checkbox" checked> Show pulled cards</label></div><div id="cardGrid" class="cards"></div><div id="emptyState" hidden>No premium hits are marked for display.</div></section>
-</main>
-<div class="ticker"><b>RECENT HITS</b><div><span id="tickerContent">Waiting for premium pulls...</span></div></div>
-<div id="celebration" class="celebration" hidden><div class="confetti"></div><div class="celebration-box"><div class="jackpot">JACKPOT HIT!</div><img id="celebrationImage" alt=""><h2 id="celebrationName"></h2><div id="celebrationValue"></div><p id="celebrationWinner"></p><small>GOOD KARMA CARDS</small></div></div>
-<template id="cardTemplate"><article class="card"><div class="image"><img class="card-image" alt=""><span class="tier"></span><div class="pulled"><div class="x"></div><b>PULLED</b></div></div><div class="copy"><h3></h3><div class="meta"><span class="number"></span><strong class="value"></strong></div><div class="winner"></div></div></article></template>
-<script src="config.js"></script><script src="app.js"></script>
-</body></html>
+
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
