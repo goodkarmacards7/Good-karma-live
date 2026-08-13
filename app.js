@@ -1,1 +1,193 @@
-(()=>{"use strict";const c=window.GOOD_KARMA_CONFIG,$=id=>document.getElementById(id),e={grid:$("cardGrid"),tpl:$("cardTemplate"),empty:$("emptyState"),show:$("showPulled"),premium:$("premiumValue"),highest:$("highestChase"),packs:$("packsRemaining"),live:$("liveHitsCount"),sold:$("hitsPulled"),total:$("totalHits"),packsSold:$("packsSold"),recent:$("recentHit"),note:$("streamNote"),dot:$("connectionDot"),text:$("connectionText"),updated:$("lastUpdated"),meterText:$("meterText"),meterPercent:$("meterPercent"),meterFill:$("meterFill"),meterDots:$("meterDots"),ticker:$("tickerContent"),celebration:$("celebration"),ci:$("celebrationImage"),cn:$("celebrationName"),cv:$("celebrationValue"),cw:$("celebrationWinner")};let hits=[],stats={},first=true;const n=v=>String(v??"").trim(),l=v=>n(v).toLowerCase(),sold=x=>c.soldWords.some(w=>l(x[c.hitColumns.status])===w),shown=x=>c.showWords.some(w=>l(x[c.hitColumns.show])===w),celebrate=x=>c.celebrateWords.some(w=>l(x[c.hitColumns.celebrate])===w),money=v=>{const x=parseFloat(n(v).replace(/[^0-9.-]/g,""));return Number.isFinite(x)?x:0},key=x=>`${n(x[c.hitColumns.name])}|${n(x[c.hitColumns.number])}`,currency=x=>`$${x.toLocaleString(undefined,{maximumFractionDigits:2})}`;function connection(ok,msg){e.dot.className=ok?"live":"error";e.text.textContent=msg}function render(){const p=hits.filter(shown),live=p.filter(x=>!sold(x)),pulled=p.filter(sold),visible=p.filter(x=>e.show.checked||!sold(x));e.grid.innerHTML="";e.empty.hidden=!!visible.length;visible.sort((a,b)=>money(b[c.hitColumns.value])-money(a[c.hitColumns.value])).forEach(x=>{const f=e.tpl.content.cloneNode(true),card=f.querySelector(".card"),img=f.querySelector("img"),winner=n(x[c.hitColumns.winner]);card.classList.toggle("sold",sold(x));img.src=n(x[c.hitColumns.image]);img.alt=n(x[c.hitColumns.name]);img.onerror=()=>img.style.opacity=.12;f.querySelector("h3").textContent=n(x[c.hitColumns.name]);f.querySelector(".number").textContent=n(x[c.hitColumns.number]);f.querySelector(".value").textContent=n(x[c.hitColumns.value]);f.querySelector(".tier").textContent=n(x[c.hitColumns.tier]);f.querySelector(".winner").textContent=winner?`Pulled by ${winner}`:"";e.grid.appendChild(f)});const totalValue=live.reduce((s,x)=>s+money(x[c.hitColumns.value]),0),highest=live.reduce((m,x)=>Math.max(m,money(x[c.hitColumns.value])),0),pct=p.length?Math.round(live.length/p.length*100):0;e.premium.textContent=currency(totalValue);e.highest.textContent=currency(highest);e.live.textContent=live.length;e.sold.textContent=pulled.length;e.total.textContent=p.length;e.packs.textContent=stats[c.statsKeys.packsRemaining]||0;e.packsSold.textContent=stats[c.statsKeys.packsSold]||0;e.note.textContent=stats[c.statsKeys.streamNote]||"Every pack contains an Illustration Rare or better.";e.meterText.textContent=`${live.length} / ${p.length} left`;e.meterPercent.textContent=`${pct}%`;e.meterFill.style.width=`${pct}%`;e.meterDots.innerHTML="";p.forEach((_,i)=>{const d=document.createElement("i");if(i<live.length)d.className="live";e.meterDots.appendChild(d)});const recent=pulled[pulled.length-1];e.recent.textContent=recent?`${n(recent[c.hitColumns.name])} ${n(recent[c.hitColumns.value])}`:"Waiting for the first pull...";const items=pulled.slice(-8).reverse().map(x=>`★ ${n(x[c.hitColumns.name])} ${n(x[c.hitColumns.value])}${n(x[c.hitColumns.winner])?` — ${n(x[c.hitColumns.winner])}`:""}`);e.ticker.textContent=items.length?items.join("     •     "):"Waiting for premium pulls..."}function showCelebration(x){e.ci.src=n(x[c.hitColumns.image]);e.cn.textContent=n(x[c.hitColumns.name]);e.cv.textContent=n(x[c.hitColumns.value]);e.cw.textContent=n(x[c.hitColumns.winner])?`Congratulations ${n(x[c.hitColumns.winner])}!`:"Congratulations!";e.celebration.hidden=false;setTimeout(()=>e.celebration.hidden=true,(Number(c.celebrationSeconds)||7)*1000)}function detect(prev,now){if(first)return;const old=new Set(prev.filter(sold).map(key)),fresh=now.filter(x=>sold(x)&&celebrate(x)&&!old.has(key(x)));if(fresh.length)showCelebration(fresh[0])}async function fetchSheet(gid){const url=`https://docs.google.com/spreadsheets/d/${c.sheetId}/gviz/tq?gid=${gid}&tqx=out:json&tq=${encodeURIComponent("select *")}&cacheBust=${Date.now()}`,r=await fetch(url,{cache:"no-store"});if(!r.ok)throw Error(`Google Sheet request failed (${r.status}).`);const t=await r.text(),p=JSON.parse(t.slice(t.indexOf("{"),t.lastIndexOf("}")+1)),h=p.table.cols.map((x,i)=>n(x.label)||`Column ${i+1}`);return p.table.rows.map(row=>{const o={};h.forEach((k,i)=>{const cell=row.c?.[i];o[k]=cell?.f??cell?.v??""});return o})}async function refresh(){try{const prev=hits.slice(),[hr,sr]=await Promise.all([fetchSheet(c.hitsGid),fetchSheet(c.statsGid)]);hits=hr.filter(x=>n(x[c.hitColumns.name]));stats={};sr.forEach(x=>{const v=Object.values(x);if(v.length>1&&n(v[0]))stats[n(v[0])]=n(v[1])});detect(prev,hits);render();first=false;connection(true,"Live Google Sheet connected");e.updated.textContent=`Updated ${new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit",second:"2-digit"})}`}catch(err){console.error(err);connection(false,err.message)}}e.show.addEventListener("change",render);refresh();setInterval(refresh,Math.max(5,Number(c.refreshSeconds)||10)*1000)})();
+(()=>{
+  "use strict";
+
+  const c = window.GOOD_KARMA_CONFIG;
+  const $ = id => document.getElementById(id);
+
+  const e = {
+    image: $("featuredImage"),
+    name: $("featuredName"),
+    number: $("featuredNumber"),
+    value: $("featuredValue"),
+    tier: $("featuredTier"),
+    counter: $("hitCounter"),
+    progress: $("rotationProgress"),
+    packs: $("packsRemaining"),
+    dot: $("connectionDot"),
+    text: $("connectionText"),
+    updated: $("lastUpdated"),
+    celebration: $("celebration"),
+    ci: $("celebrationImage"),
+    cn: $("celebrationName"),
+    cv: $("celebrationValue"),
+    cw: $("celebrationWinner")
+  };
+
+  let hits = [];
+  let stats = {};
+  let first = true;
+  let featuredHits = [];
+  let featuredIndex = 0;
+  let currentFeaturedKey = "";
+
+  const rotationSeconds = 4;
+  const n = v => String(v ?? "").trim();
+  const l = v => n(v).toLowerCase();
+  const sold = x => c.soldWords.some(w => l(x[c.hitColumns.status]) === w);
+  const shown = x => c.showWords.some(w => l(x[c.hitColumns.show]) === w);
+  const celebrate = x => c.celebrateWords.some(w => l(x[c.hitColumns.celebrate]) === w);
+  const money = v => {
+    const x = parseFloat(n(v).replace(/[^0-9.-]/g,""));
+    return Number.isFinite(x) ? x : 0;
+  };
+  const key = x => `${n(x[c.hitColumns.name])}|${n(x[c.hitColumns.number])}`;
+
+  function connection(ok,msg){
+    e.dot.className = `connection-dot ${ok ? "live" : "error"}`;
+    e.text.textContent = msg;
+  }
+
+  function restartProgress(){
+    e.progress.classList.remove("run");
+    void e.progress.offsetWidth;
+    e.progress.style.animationDuration = `${rotationSeconds}s`;
+    e.progress.classList.add("run");
+  }
+
+  function showFeatured(animate=true){
+    if(!featuredHits.length){
+      document.body.classList.add("empty-featured");
+      e.name.textContent = "Premium hits coming up...";
+      e.number.textContent = "";
+      e.value.textContent = "";
+      e.tier.textContent = "";
+      e.counter.textContent = "";
+      e.image.removeAttribute("src");
+      return;
+    }
+
+    document.body.classList.remove("empty-featured");
+    featuredIndex = Math.min(featuredIndex, featuredHits.length - 1);
+    const x = featuredHits[featuredIndex];
+    currentFeaturedKey = key(x);
+
+    const apply = () => {
+      e.image.src = n(x[c.hitColumns.image]);
+      e.image.alt = n(x[c.hitColumns.name]);
+      e.image.onerror = () => { e.image.style.opacity = .12; };
+      e.image.onload = () => { e.image.style.opacity = ""; };
+      e.name.textContent = n(x[c.hitColumns.name]) || "Premium Hit";
+      e.number.textContent = n(x[c.hitColumns.number]);
+      e.value.textContent = n(x[c.hitColumns.value]);
+      e.tier.textContent = n(x[c.hitColumns.tier]);
+      e.counter.textContent = `${featuredIndex + 1} OF ${featuredHits.length} PREMIUM HITS LEFT`;
+      e.image.classList.remove("changing");
+      restartProgress();
+    };
+
+    if(animate){
+      e.image.classList.add("changing");
+      setTimeout(apply,180);
+    } else {
+      apply();
+    }
+  }
+
+  function rotateFeatured(){
+    if(featuredHits.length <= 1){
+      restartProgress();
+      return;
+    }
+    featuredIndex = (featuredIndex + 1) % featuredHits.length;
+    showFeatured(true);
+  }
+
+  function render(){
+    const previousKey = currentFeaturedKey;
+
+    featuredHits = hits
+      .filter(x => shown(x) && !sold(x))
+      .sort((a,b) => money(b[c.hitColumns.value]) - money(a[c.hitColumns.value]));
+
+    if(previousKey){
+      const stillHere = featuredHits.findIndex(x => key(x) === previousKey);
+      if(stillHere >= 0) featuredIndex = stillHere;
+      else featuredIndex = featuredIndex % Math.max(featuredHits.length,1);
+    } else {
+      featuredIndex = 0;
+    }
+
+    e.packs.textContent = stats[c.statsKeys.packsRemaining] || 0;
+    showFeatured(false);
+  }
+
+  function showCelebration(x){
+    e.ci.src = n(x[c.hitColumns.image]);
+    e.cn.textContent = n(x[c.hitColumns.name]);
+    e.cv.textContent = n(x[c.hitColumns.value]);
+    e.cw.textContent = n(x[c.hitColumns.winner])
+      ? `Congratulations ${n(x[c.hitColumns.winner])}!`
+      : "Congratulations!";
+    e.celebration.hidden = false;
+    setTimeout(
+      () => e.celebration.hidden = true,
+      (Number(c.celebrationSeconds) || 6) * 1000
+    );
+  }
+
+  function detect(prev,now){
+    if(first) return;
+    const old = new Set(prev.filter(sold).map(key));
+    const fresh = now.filter(x => sold(x) && celebrate(x) && !old.has(key(x)));
+    if(fresh.length) showCelebration(fresh[0]);
+  }
+
+  async function fetchSheet(gid){
+    const url = `https://docs.google.com/spreadsheets/d/${c.sheetId}/gviz/tq?gid=${gid}&tqx=out:json&tq=${encodeURIComponent("select *")}&cacheBust=${Date.now()}`;
+    const r = await fetch(url,{cache:"no-store"});
+    if(!r.ok) throw Error(`Google Sheet request failed (${r.status}).`);
+    const t = await r.text();
+    const p = JSON.parse(t.slice(t.indexOf("{"),t.lastIndexOf("}")+1));
+    const h = p.table.cols.map((x,i) => n(x.label) || `Column ${i+1}`);
+    return p.table.rows.map(row => {
+      const o = {};
+      h.forEach((k,i) => {
+        const cell = row.c?.[i];
+        o[k] = cell?.f ?? cell?.v ?? "";
+      });
+      return o;
+    });
+  }
+
+  async function refresh(){
+    try{
+      const prev = hits.slice();
+      const [hr,sr] = await Promise.all([
+        fetchSheet(c.hitsGid),
+        fetchSheet(c.statsGid)
+      ]);
+
+      hits = hr.filter(x => n(x[c.hitColumns.name]));
+      stats = {};
+      sr.forEach(x => {
+        const v = Object.values(x);
+        if(v.length > 1 && n(v[0])) stats[n(v[0])] = n(v[1]);
+      });
+
+      detect(prev,hits);
+      render();
+      first = false;
+      connection(true,"Google Sheet live");
+      e.updated.textContent = `Updated ${new Date().toLocaleTimeString([],{
+        hour:"numeric",minute:"2-digit",second:"2-digit"
+      })}`;
+    }catch(err){
+      console.error(err);
+      connection(false,err.message);
+    }
+  }
+
+  refresh();
+  setInterval(refresh,Math.max(2,Number(c.refreshSeconds)||2)*1000);
+  setInterval(rotateFeatured,rotationSeconds*1000);
+})();
