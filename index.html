@@ -1,167 +1,34 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+.guarantee-large{
+  display:inline-block;
+  margin-bottom:28px;
+  padding:18px 26px;
 
-<title>Good Karma Cards | Live Good Karma Pulls</title>
+  background:var(--y);
+  color:#000;
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  border:4px solid #fff;
+  border-radius:18px;
 
-<link
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap"
-  rel="stylesheet"
->
+  font-size:clamp(34px,4.8vw,72px);
+  font-weight:900;
+  line-height:.92;
+  letter-spacing:-.04em;
 
-<link rel="stylesheet" href="styles.css">
-</head>
+  text-transform:uppercase;
 
-<body>
+  box-shadow:
+    0 0 0 5px #000,
+    0 0 28px rgba(255,212,0,.45);
 
-<main class="stream-display">
+  transform:rotate(-1deg);
+}
 
-  <header class="stream-header">
+.guarantee-large span{
+  display:block;
+  margin-top:8px;
 
-    <div class="brand-lockup">
+  color:#000;
 
-      <div class="logo">
-        GK
-      </div>
-
-      <div>
-
-        <div class="eyebrow">
-          GOOD KARMA CARDS
-        </div>
-
-        <h1>
-          GOOD KARMA PULLS
-        </h1>
-
-      </div>
-
-    </div>
-
-    <div class="live-pill">
-      <span class="live-dot"></span>
-      LIVE
-    </div>
-
-  </header>
-
-
-  <section
-    class="featured-stage"
-    aria-live="polite"
-  >
-
-    <div class="featured-image-wrap">
-
-      <img
-        id="featuredImage"
-        class="featured-image"
-        alt="Featured premium hit"
-      >
-
-      <div
-        id="featuredTier"
-        class="tier-badge"
-      ></div>
-
-    </div>
-
-
-    <div class="featured-copy">
-
-      <div class="guarantee-large">
-        GUARANTEED IR OR BETTER
-        <span>IN EVERY PACK</span>
-      </div>
-
-      <div class="featured-label">
-        FEATURED HIT
-      </div>
-
-      <h2 id="featuredName">
-        Loading premium hits...
-      </h2>
-
-      <div
-        id="featuredNumber"
-        class="featured-number"
-      ></div>
-
-      <div class="rotation-progress">
-        <div id="rotationProgress"></div>
-      </div>
-
-      <div
-        id="hitCounter"
-        class="hit-counter"
-      ></div>
-
-    </div>
-
-  </section>
-
-
-  <div class="status-line">
-
-    <span
-      id="connectionDot"
-      class="connection-dot"
-    ></span>
-
-    <span id="connectionText">
-      Connecting...
-    </span>
-
-    <span class="divider">
-      •
-    </span>
-
-    <span id="lastUpdated"></span>
-
-  </div>
-
-</main>
-
-
-<div
-  id="celebration"
-  class="celebration"
-  hidden
->
-
-  <div class="confetti"></div>
-
-  <div class="celebration-box">
-
-    <div class="jackpot">
-      BIG HIT!
-    </div>
-
-    <img
-      id="celebrationImage"
-      alt=""
-    >
-
-    <h2 id="celebrationName"></h2>
-
-    <p id="celebrationWinner"></p>
-
-    <small>
-      GOOD KARMA CARDS
-    </small>
-
-  </div>
-
-</div>
-
-
-<script src="config.js"></script>
-<script src="app.js?v=8"></script>
-
-</body>
-</html>
+  font-size:.62em;
+  letter-spacing:.02em;
+}
