@@ -22,7 +22,7 @@
 
   let hits = [];
   let featuredHits = [];
-  let featuredIndex = 0;
+  let currentKey = null;
   let firstLoad = true;
 
   const rotationSeconds = 4;
@@ -38,12 +38,12 @@
 
   const sold = x =>
     c.soldWords.some(
-      w => l(x[c.hitColumns.status]) === w
+      w => l(x[c.hitColumns.status]) === l(w)
     );
 
   const celebrate = x =>
     c.celebrateWords.some(
-      w => l(x[c.hitColumns.celebrate]) === w
+      w => l(x[c.hitColumns.celebrate]) === l(w)
     );
 
   const tierMatch = x =>
@@ -52,20 +52,35 @@
     );
 
   const money = v => {
-    const x = parseFloat(
+    const amount = parseFloat(
       n(v).replace(/[^0-9.-]/g, "")
     );
 
-    return Number.isFinite(x) ? x : 0;
+    return Number.isFinite(amount)
+      ? amount
+      : 0;
   };
 
-  const key = x =>
-    [
+  /*
+    Card identity.
+
+    We use the image URL first because every
+    featured hit should have its own image.
+  */
+
+  const cardKey = x => {
+    const image = n(x[c.hitColumns.image]);
+
+    if (image) {
+      return image;
+    }
+
+    return [
       n(x[c.hitColumns.name]),
       n(x[c.hitColumns.number]),
-      n(x[c.hitColumns.image]),
       n(x[c.hitColumns.tier])
     ].join("|");
+  };
 
   function connection(ok, msg) {
     e.dot.className =
@@ -85,10 +100,67 @@
     e.progress.classList.add("run");
   }
 
-  function displayCurrentHit(animate = true) {
+  /*
+    Prevent duplicate cards from appearing
+    multiple times in the slideshow.
+  */
 
-    if (!featuredHits.length) {
+  function removeDuplicates(list) {
+    const seen = new Set();
 
+    return list.filter(card => {
+      const k = cardKey(card);
+
+      if (seen.has(k)) {
+        return false;
+      }
+
+      seen.add(k);
+
+      return true;
+    });
+  }
+
+  function rebuildFeaturedHits() {
+
+    let list = hits
+      .filter(card =>
+        tierMatch(card) &&
+        !sold(card)
+      )
+      .sort((a, b) =>
+        money(b[c.hitColumns.value]) -
+        money(a[c.hitColumns.value])
+      );
+
+    featuredHits =
+      removeDuplicates(list);
+
+    /*
+      If the card currently being displayed
+      was just sold, clear the current key.
+
+      The next rotation will immediately find
+      a valid card instead of getting stuck.
+    */
+
+    if (
+      currentKey &&
+      !featuredHits.some(
+        card => cardKey(card) === currentKey
+      )
+    ) {
+      currentKey = null;
+
+      if (featuredHits.length) {
+        displayCard(featuredHits[0], false);
+      }
+    }
+  }
+
+  function displayCard(card, animate = true) {
+
+    if (!card) {
       document.body.classList.add(
         "empty-featured"
       );
@@ -102,6 +174,8 @@
 
       e.image.removeAttribute("src");
 
+      currentKey = null;
+
       return;
     }
 
@@ -109,22 +183,23 @@
       "empty-featured"
     );
 
-    if (featuredIndex >= featuredHits.length) {
-      featuredIndex = 0;
-    }
+    currentKey = cardKey(card);
 
-    const x = featuredHits[featuredIndex];
+    const index =
+      featuredHits.findIndex(
+        x => cardKey(x) === currentKey
+      );
 
     const apply = () => {
 
       e.image.src =
-        n(x[c.hitColumns.image]);
+        n(card[c.hitColumns.image]);
 
       e.image.alt =
-        n(x[c.hitColumns.name]);
+        n(card[c.hitColumns.name]);
 
       e.image.onerror = () => {
-        e.image.style.opacity = .12;
+        e.image.style.opacity = ".15";
       };
 
       e.image.onload = () => {
@@ -132,17 +207,17 @@
       };
 
       e.name.textContent =
-        n(x[c.hitColumns.name]) ||
+        n(card[c.hitColumns.name]) ||
         "Featured Hit";
 
       e.number.textContent =
-        n(x[c.hitColumns.number]);
+        n(card[c.hitColumns.number]);
 
       e.tier.textContent =
-        n(x[c.hitColumns.tier]);
+        n(card[c.hitColumns.tier]);
 
       e.counter.textContent =
-        `${featuredIndex + 1} OF ${featuredHits.length} HITS LEFT`;
+        `${index + 1} OF ${featuredHits.length} HITS`;
 
       e.image.classList.remove(
         "changing"
@@ -157,7 +232,10 @@
         "changing"
       );
 
-      setTimeout(apply, 180);
+      setTimeout(
+        apply,
+        180
+      );
 
     } else {
 
@@ -165,101 +243,78 @@
     }
   }
 
+  /*
+    This is now the ONLY function that
+    controls slideshow advancement.
+  */
+
   function rotateFeatured() {
 
     if (!featuredHits.length) {
+      displayCard(null);
       return;
     }
 
-    if (featuredHits.length === 1) {
-      restartProgress();
-      return;
-    }
+    /*
+      First card
+    */
 
-    featuredIndex++;
-
-    if (featuredIndex >= featuredHits.length) {
-      featuredIndex = 0;
-    }
-
-    displayCurrentHit(true);
-  }
-
-  function rebuildFeaturedHits() {
-
-    const current =
-      featuredHits[featuredIndex];
-
-    const currentKey =
-      current ? key(current) : null;
-
-    const newList = hits
-
-      .filter(x =>
-        tierMatch(x) &&
-        !sold(x)
-      )
-
-      .sort((a, b) =>
-        money(b[c.hitColumns.value]) -
-        money(a[c.hitColumns.value])
+    if (!currentKey) {
+      displayCard(
+        featuredHits[0],
+        true
       );
-
-    featuredHits = newList;
-
-    if (!featuredHits.length) {
-
-      featuredIndex = 0;
-
-      displayCurrentHit(false);
 
       return;
     }
 
     /*
-      If the card currently being displayed
-      still exists, leave it on screen.
+      Find the ACTUAL currently displayed card,
+      instead of relying on a saved number.
     */
 
-    if (currentKey) {
+    const currentIndex =
+      featuredHits.findIndex(
+        card =>
+          cardKey(card) === currentKey
+      );
 
-      const newIndex =
-        featuredHits.findIndex(
-          x => key(x) === currentKey
-        );
+    let nextIndex;
 
-      if (newIndex >= 0) {
+    if (currentIndex === -1) {
+      nextIndex = 0;
+    } else {
+      nextIndex =
+        currentIndex + 1;
 
-        featuredIndex = newIndex;
-
-        return;
+      if (
+        nextIndex >=
+        featuredHits.length
+      ) {
+        nextIndex = 0;
       }
     }
 
-    /*
-      Current card disappeared because
-      it was sold/pulled.
-      Immediately move to the next card.
-    */
-
-    if (featuredIndex >= featuredHits.length) {
-      featuredIndex = 0;
-    }
-
-    displayCurrentHit(false);
+    displayCard(
+      featuredHits[nextIndex],
+      true
+    );
   }
 
-  function showCelebration(x) {
+  function showCelebration(card) {
 
     e.ci.src =
-      n(x[c.hitColumns.image]);
+      n(card[c.hitColumns.image]);
 
     e.cn.textContent =
-      n(x[c.hitColumns.name]);
+      n(card[c.hitColumns.name]);
+
+    const winner =
+      n(card[c.hitColumns.winner]);
 
     e.cw.textContent =
-      n(x[c.hitColumns.winner])
-        ? `Congratulations ${n(x[c.hitColumns.winner])}!`
+      winner
+        ? `Congratulations ${winner}!`
         : "Congratulations!";
 
     e.celebration.hidden = false;
@@ -273,27 +328,32 @@
     );
   }
 
-  function detect(prev, now) {
+  function detectPulled(prev, now) {
 
     if (firstLoad) {
       return;
     }
 
-    const old = new Set(
-      prev
-        .filter(sold)
-        .map(key)
-    );
+    const previouslySold =
+      new Set(
+        prev
+          .filter(sold)
+          .map(cardKey)
+      );
 
-    const fresh = now.filter(
-      x =>
-        sold(x) &&
-        celebrate(x) &&
-        !old.has(key(x))
-    );
+    const newlySold =
+      now.filter(card =>
+        sold(card) &&
+        celebrate(card) &&
+        !previouslySold.has(
+          cardKey(card)
+        )
+      );
 
-    if (fresh.length) {
-      showCelebration(fresh[0]);
+    if (newlySold.length) {
+      showCelebration(
+        newlySold[0]
+      );
     }
   }
 
@@ -306,58 +366,66 @@
       `&tq=${encodeURIComponent("select *")}` +
       `&cacheBust=${Date.now()}`;
 
-    const r = await fetch(
-      url,
-      { cache: "no-store" }
-    );
+    const response =
+      await fetch(
+        url,
+        {
+          cache: "no-store"
+        }
+      );
 
-    if (!r.ok) {
-
+    if (!response.ok) {
       throw Error(
-        `Google Sheet request failed (${r.status}).`
+        `Google Sheet request failed (${response.status}).`
       );
     }
 
-    const t = await r.text();
+    const text =
+      await response.text();
 
-    const p = JSON.parse(
-      t.slice(
-        t.indexOf("{"),
-        t.lastIndexOf("}") + 1
-      )
-    );
+    const data =
+      JSON.parse(
+        text.slice(
+          text.indexOf("{"),
+          text.lastIndexOf("}") + 1
+        )
+      );
 
     const headers =
-      p.table.cols.map(
-        (x, i) =>
-          n(x.label) ||
+      data.table.cols.map(
+        (column, i) =>
+          n(column.label) ||
           `Column ${i + 1}`
       );
 
-    return p.table.rows.map(row => {
+    return data.table.rows.map(
+      row => {
 
-      const o = {};
+        const object = {};
 
-      headers.forEach((k, i) => {
+        headers.forEach(
+          (header, i) => {
 
-        const cell =
-          row.c?.[i];
+            const cell =
+              row.c?.[i];
 
-        o[k] =
-          cell?.f ??
-          cell?.v ??
-          "";
-      });
+            object[header] =
+              cell?.f ??
+              cell?.v ??
+              "";
+          }
+        );
 
-      return o;
-    });
+        return object;
+      }
+    );
   }
 
   async function refresh() {
 
     try {
 
-      const previousHits =
+      const previous =
         hits.slice();
 
       const rows =
@@ -365,25 +433,42 @@
           c.hitsGid
         );
 
-      hits = rows.filter(
-        x =>
-          n(x[c.hitColumns.name])
-      );
+      hits =
+        rows.filter(
+          card =>
+            n(card[c.hitColumns.name])
+        );
 
-      detect(
-        previousHits,
+      detectPulled(
+        previous,
         hits
       );
+
+      /*
+        Refreshing the Sheet only rebuilds
+        the AVAILABLE CARD LIST.
+
+        It does NOT advance or reset
+        the slideshow.
+      */
 
       rebuildFeaturedHits();
 
       if (firstLoad) {
 
-        featuredIndex = 0;
-
-        displayCurrentHit(false);
-
         firstLoad = false;
+
+        if (featuredHits.length) {
+
+          displayCard(
+            featuredHits[0],
+            false
+          );
+
+        } else {
+
+          displayCard(null);
+        }
       }
 
       connection(
@@ -392,11 +477,14 @@
       );
 
       e.updated.textContent =
-        `Updated ${new Date().toLocaleTimeString([], {
-          hour: "numeric",
-          minute: "2-digit",
-          second: "2-digit"
-        })}`;
+        `Updated ${new Date().toLocaleTimeString(
+          [],
+          {
+            hour: "numeric",
+            minute: "2-digit",
+            second: "2-digit"
+          }
+        )}`;
 
     } catch (err) {
 
@@ -410,10 +498,9 @@
   }
 
   /*
-    SHEET REFRESH
+    DATA
 
-    Checks admin changes every 2 seconds.
-    Does NOT control the slideshow.
+    Update inventory every 2 seconds.
   */
 
   refresh();
@@ -429,8 +516,7 @@
   /*
     SLIDESHOW
 
-    Completely independent from
-    Google Sheet refreshing.
+    Completely separate.
   */
 
   setInterval(
