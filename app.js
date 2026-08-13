@@ -8,23 +8,19 @@
     image: $("featuredImage"),
     name: $("featuredName"),
     number: $("featuredNumber"),
-    value: $("featuredValue"),
     tier: $("featuredTier"),
     counter: $("hitCounter"),
     progress: $("rotationProgress"),
-    packs: $("packsRemaining"),
     dot: $("connectionDot"),
     text: $("connectionText"),
     updated: $("lastUpdated"),
     celebration: $("celebration"),
     ci: $("celebrationImage"),
     cn: $("celebrationName"),
-    cv: $("celebrationValue"),
     cw: $("celebrationWinner")
   };
 
   let hits = [];
-  let stats = {};
   let first = true;
   let featuredHits = [];
   let featuredIndex = 0;
@@ -59,7 +55,6 @@
       document.body.classList.add("empty-featured");
       e.name.textContent = "Premium hits coming up...";
       e.number.textContent = "";
-      e.value.textContent = "";
       e.tier.textContent = "";
       e.counter.textContent = "";
       e.image.removeAttribute("src");
@@ -78,7 +73,6 @@
       e.image.onload = () => { e.image.style.opacity = ""; };
       e.name.textContent = n(x[c.hitColumns.name]) || "Premium Hit";
       e.number.textContent = n(x[c.hitColumns.number]);
-      e.value.textContent = n(x[c.hitColumns.value]);
       e.tier.textContent = n(x[c.hitColumns.tier]);
       e.counter.textContent = `${featuredIndex + 1} OF ${featuredHits.length} PREMIUM HITS LEFT`;
       e.image.classList.remove("changing");
@@ -117,14 +111,12 @@
       featuredIndex = 0;
     }
 
-    e.packs.textContent = stats[c.statsKeys.packsRemaining] || 0;
     showFeatured(false);
   }
 
   function showCelebration(x){
     e.ci.src = n(x[c.hitColumns.image]);
     e.cn.textContent = n(x[c.hitColumns.name]);
-    e.cv.textContent = n(x[c.hitColumns.value]);
     e.cw.textContent = n(x[c.hitColumns.winner])
       ? `Congratulations ${n(x[c.hitColumns.winner])}!`
       : "Congratulations!";
@@ -162,25 +154,15 @@
   async function refresh(){
     try{
       const prev = hits.slice();
-      const [hr,sr] = await Promise.all([
-        fetchSheet(c.hitsGid),
-        fetchSheet(c.statsGid)
-      ]);
+      const hr = await fetchSheet(c.hitsGid);
 
       hits = hr.filter(x => n(x[c.hitColumns.name]));
-      stats = {};
-      sr.forEach(x => {
-        const v = Object.values(x);
-        if(v.length > 1 && n(v[0])) stats[n(v[0])] = n(v[1]);
-      });
 
       detect(prev,hits);
       render();
       first = false;
       connection(true,"Google Sheet live");
-      e.updated.textContent = `Updated ${new Date().toLocaleTimeString([],{
-        hour:"numeric",minute:"2-digit",second:"2-digit"
-      })}`;
+      e.updated.textContent = `Updated ${new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit",second:"2-digit"})}`;
     }catch(err){
       console.error(err);
       connection(false,err.message);
