@@ -8,37 +8,51 @@
     image: $("featuredImage"),
     name: $("featuredName"),
     number: $("featuredNumber"),
+    value: $("featuredValue"),
     tier: $("featuredTier"),
     counter: $("hitCounter"),
     progress: $("rotationProgress"),
+    packs: $("packsRemaining"),
+
     dot: $("connectionDot"),
     text: $("connectionText"),
     updated: $("lastUpdated"),
+
     celebration: $("celebration"),
     ci: $("celebrationImage"),
     cn: $("celebrationName"),
+    cv: $("celebrationValue"),
     cw: $("celebrationWinner")
   };
 
   let hits = [];
+  let stats = {};
+  let first = true;
+
   let featuredHits = [];
   let featuredIndex = 0;
-  let firstLoad = true;
+  let currentFeaturedKey = "";
 
+  /*
+    FEATURED CARD ROTATION SPEED
+    The display changes to the next premium hit every 4 seconds.
+  */
   const rotationSeconds = 4;
 
-  const allowedTiers = [
-    "top chase",
-    "chase",
-    "premium"
-  ];
+  const n = v =>
+    String(v ?? "").trim();
 
-  const n = v => String(v ?? "").trim();
-  const l = v => n(v).toLowerCase();
+  const l = v =>
+    n(v).toLowerCase();
 
   const sold = x =>
     c.soldWords.some(
       w => l(x[c.hitColumns.status]) === l(w)
+    );
+
+  const shown = x =>
+    c.showWords.some(
+      w => l(x[c.hitColumns.show]) === l(w)
     );
 
   const celebrate = x =>
@@ -46,37 +60,25 @@
       w => l(x[c.hitColumns.celebrate]) === l(w)
     );
 
-  const tierMatch = x =>
-    allowedTiers.includes(
-      l(x[c.hitColumns.tier])
-    );
-
   const money = v => {
-    const amount = parseFloat(
-      n(v).replace(/[^0-9.-]/g, "")
+    const x = parseFloat(
+      n(v).replace(/[^0-9.-]/g,"")
     );
 
-    return Number.isFinite(amount)
-      ? amount
-      : 0;
+    return Number.isFinite(x) ? x : 0;
   };
 
-  const cardKey = x =>
-    [
-      n(x[c.hitColumns.name]),
-      n(x[c.hitColumns.number]),
-      n(x[c.hitColumns.tier]),
-      n(x[c.hitColumns.image])
-    ].join("|");
+  const key = x =>
+    `${n(x[c.hitColumns.name])}|${n(x[c.hitColumns.number])}`;
 
-  function connection(ok, msg) {
+  function connection(ok,msg){
     e.dot.className =
       `connection-dot ${ok ? "live" : "error"}`;
 
     e.text.textContent = msg;
   }
 
-  function restartProgress() {
+  function restartProgress(){
     e.progress.classList.remove("run");
 
     void e.progress.offsetWidth;
@@ -87,25 +89,9 @@
     e.progress.classList.add("run");
   }
 
-  function removeDuplicates(list) {
-    const seen = new Set();
+  function showFeatured(animate=true){
 
-    return list.filter(card => {
-      const key = cardKey(card);
-
-      if (seen.has(key)) {
-        return false;
-      }
-
-      seen.add(key);
-
-      return true;
-    });
-  }
-
-  function displayCurrentCard(animate = true) {
-
-    if (!featuredHits.length) {
+    if(!featuredHits.length){
       document.body.classList.add(
         "empty-featured"
       );
@@ -114,6 +100,7 @@
         "Premium hits coming up...";
 
       e.number.textContent = "";
+      e.value.textContent = "";
       e.tier.textContent = "";
       e.counter.textContent = "";
 
@@ -126,27 +113,26 @@
       "empty-featured"
     );
 
-    if (featuredIndex >= featuredHits.length) {
-      featuredIndex = 0;
-    }
+    featuredIndex = Math.min(
+      featuredIndex,
+      featuredHits.length - 1
+    );
 
-    if (featuredIndex < 0) {
-      featuredIndex = 0;
-    }
-
-    const card =
+    const x =
       featuredHits[featuredIndex];
+
+    currentFeaturedKey = key(x);
 
     const apply = () => {
 
       e.image.src =
-        n(card[c.hitColumns.image]);
+        n(x[c.hitColumns.image]);
 
       e.image.alt =
-        n(card[c.hitColumns.name]);
+        n(x[c.hitColumns.name]);
 
       e.image.onerror = () => {
-        e.image.style.opacity = ".15";
+        e.image.style.opacity = .12;
       };
 
       e.image.onload = () => {
@@ -154,17 +140,20 @@
       };
 
       e.name.textContent =
-        n(card[c.hitColumns.name]) ||
-        "Featured Hit";
+        n(x[c.hitColumns.name]) ||
+        "Premium Hit";
 
       e.number.textContent =
-        n(card[c.hitColumns.number]);
+        n(x[c.hitColumns.number]);
+
+      e.value.textContent =
+        n(x[c.hitColumns.value]);
 
       e.tier.textContent =
-        n(card[c.hitColumns.tier]);
+        n(x[c.hitColumns.tier]);
 
       e.counter.textContent =
-        `${featuredIndex + 1} OF ${featuredHits.length} HITS`;
+        `${featuredIndex + 1} OF ${featuredHits.length} HITS LEFT`;
 
       e.image.classList.remove(
         "changing"
@@ -173,111 +162,118 @@
       restartProgress();
     };
 
-    if (animate) {
-
+    if(animate){
       e.image.classList.add(
         "changing"
       );
 
-      setTimeout(
-        apply,
-        180
-      );
-
-    } else {
-
+      setTimeout(apply,180);
+    }else{
       apply();
     }
   }
 
-  function rotateFeatured() {
+  function rotateFeatured(){
 
-    if (!featuredHits.length) {
-      return;
-    }
-
-    if (featuredHits.length === 1) {
+    if(featuredHits.length <= 1){
       restartProgress();
       return;
     }
 
-    featuredIndex += 1;
-
-    if (featuredIndex >= featuredHits.length) {
-      featuredIndex = 0;
-    }
-
-    displayCurrentCard(true);
-  }
-
-  function rebuildFeaturedHits() {
-
-    const oldLength =
+    featuredIndex =
+      (featuredIndex + 1) %
       featuredHits.length;
 
-    let newList = hits
-      .filter(card =>
-        tierMatch(card) &&
-        !sold(card)
-      )
-      .sort((a, b) =>
-        money(b[c.hitColumns.value]) -
-        money(a[c.hitColumns.value])
-      );
-
-    newList =
-      removeDuplicates(newList);
-
-    featuredHits =
-      newList;
-
-    /*
-      IMPORTANT:
-      Refreshing the Sheet does NOT
-      reset featuredIndex.
-
-      We only fix the index if the list
-      becomes shorter than our current
-      position.
-    */
-
-    if (!featuredHits.length) {
-      featuredIndex = 0;
-      displayCurrentCard(false);
-      return;
-    }
-
-    if (featuredIndex >= featuredHits.length) {
-      featuredIndex = 0;
-      displayCurrentCard(false);
-      return;
-    }
-
-    /*
-      First load only.
-    */
-
-    if (firstLoad) {
-      featuredIndex = 0;
-      displayCurrentCard(false);
-    }
+    showFeatured(true);
   }
 
-  function showCelebration(card) {
+  function render(){
+
+    const previousKey =
+      currentFeaturedKey;
+
+    /*
+      Only show hits that:
+      1. are marked Show on Board
+      2. have NOT been sold/pulled/claimed
+
+      Highest-value hits are shown first.
+    */
+    featuredHits = hits
+      .filter(
+        x => shown(x) && !sold(x)
+      )
+      .sort(
+        (a,b) =>
+          money(b[c.hitColumns.value]) -
+          money(a[c.hitColumns.value])
+      );
+
+    /*
+      Keep the same card on screen
+      when the Sheet refreshes,
+      unless that card was just sold.
+    */
+    if(previousKey){
+
+      const stillHere =
+        featuredHits.findIndex(
+          x => key(x) === previousKey
+        );
+
+      if(stillHere >= 0){
+        featuredIndex = stillHere;
+      }else{
+        featuredIndex =
+          featuredIndex %
+          Math.max(
+            featuredHits.length,
+            1
+          );
+      }
+
+    }else{
+      featuredIndex = 0;
+    }
+
+    if(e.packs){
+      e.packs.textContent =
+        stats[c.statsKeys.packsRemaining] ||
+        "0";
+    }
+
+    showFeatured(false);
+  }
+
+  function showCelebration(x){
 
     e.ci.src =
-      n(card[c.hitColumns.image]);
+      n(x[c.hitColumns.image]);
 
     e.cn.textContent =
-      n(card[c.hitColumns.name]);
+      n(x[c.hitColumns.name]) ||
+      "BIG HIT!";
 
-    const winner =
-      n(card[c.hitColumns.winner]);
+    if(e.cv){
+      e.cv.textContent =
+        n(x[c.hitColumns.value]);
+    }
 
-    e.cw.textContent =
-      winner
-        ? `Congratulations ${winner}!`
-        : "Congratulations!";
+    if(e.cw){
+
+      const winnerColumn =
+        c.hitColumns.winner;
+
+      const winner =
+        winnerColumn
+          ? n(x[winnerColumn])
+          : "";
+
+      e.cw.textContent =
+        winner
+          ? `Congratulations ${winner}!`
+          : "Congratulations!";
+    }
 
     e.celebration.hidden = false;
 
@@ -290,125 +286,157 @@
     );
   }
 
-  function detectPulled(prev, now) {
+  function detect(prev,now){
 
-    if (firstLoad) {
+    if(first){
       return;
     }
 
-    const previouslySold =
+    const old =
       new Set(
         prev
           .filter(sold)
-          .map(cardKey)
+          .map(key)
       );
 
-    const newlySold =
-      now.filter(card =>
-        sold(card) &&
-        celebrate(card) &&
-        !previouslySold.has(
-          cardKey(card)
-        )
+    const fresh =
+      now.filter(
+        x =>
+          sold(x) &&
+          celebrate(x) &&
+          !old.has(key(x))
       );
 
-    if (newlySold.length) {
+    if(fresh.length){
       showCelebration(
-        newlySold[0]
+        fresh[0]
       );
     }
   }
 
-  async function fetchSheet(gid) {
+  async function fetchSheet(gid){
 
     const url =
       `https://docs.google.com/spreadsheets/d/${c.sheetId}` +
-      `/gviz/tq?gid=${gid}` +
+      `/gviz/tq?gid=${encodeURIComponent(gid)}` +
       `&tqx=out:json` +
       `&tq=${encodeURIComponent("select *")}` +
       `&cacheBust=${Date.now()}`;
 
-    const response =
+    const r =
       await fetch(
         url,
         {
-          cache: "no-store"
+          cache:"no-store"
         }
       );
 
-    if (!response.ok) {
+    if(!r.ok){
       throw Error(
-        `Google Sheet request failed (${response.status}).`
+        `Google Sheet request failed (${r.status}).`
       );
     }
 
-    const text =
-      await response.text();
+    const t =
+      await r.text();
 
-    const data =
+    const start =
+      t.indexOf("{");
+
+    const end =
+      t.lastIndexOf("}");
+
+    if(start < 0 || end < 0){
+      throw Error(
+        "Google Sheet returned unreadable data."
+      );
+    }
+
+    const p =
       JSON.parse(
-        text.slice(
-          text.indexOf("{"),
-          text.lastIndexOf("}") + 1
+        t.slice(
+          start,
+          end + 1
         )
       );
 
-    const headers =
-      data.table.cols.map(
-        (column, i) =>
-          n(column.label) ||
+    const h =
+      p.table.cols.map(
+        (x,i) =>
+          n(x.label) ||
           `Column ${i + 1}`
       );
 
-    return data.table.rows.map(
+    return p.table.rows.map(
       row => {
 
-        const object = {};
+        const o = {};
 
-        headers.forEach(
-          (header, i) => {
+        h.forEach(
+          (k,i) => {
 
             const cell =
               row.c?.[i];
 
-            object[header] =
+            o[k] =
               cell?.f ??
               cell?.v ??
               "";
           }
         );
 
-        return object;
+        return o;
       }
     );
   }
 
-  async function refresh() {
+  async function refresh(){
 
-    try {
+    try{
 
-      const previous =
+      const prev =
         hits.slice();
 
-      const rows =
-        await fetchSheet(
-          c.hitsGid
-        );
+      const [hr,sr] =
+        await Promise.all([
+          fetchSheet(c.hitsGid),
+          fetchSheet(c.statsGid)
+        ]);
 
       hits =
-        rows.filter(
-          card =>
-            n(card[c.hitColumns.name])
+        hr.filter(
+          x =>
+            n(
+              x[c.hitColumns.name]
+            )
         );
 
-      detectPulled(
-        previous,
+      stats = {};
+
+      sr.forEach(
+        x => {
+
+          const values =
+            Object.values(x);
+
+          if(
+            values.length > 1 &&
+            n(values[0])
+          ){
+            stats[n(values[0])] =
+              n(values[1]);
+          }
+        }
+      );
+
+      detect(
+        prev,
         hits
       );
 
-      rebuildFeaturedHits();
+      render();
 
-      firstLoad = false;
+      first = false;
 
       connection(
         true,
@@ -416,16 +444,13 @@
       );
 
       e.updated.textContent =
-        `Updated ${new Date().toLocaleTimeString(
-          [],
-          {
-            hour: "numeric",
-            minute: "2-digit",
-            second: "2-digit"
-          }
-        )}`;
+        `Updated ${new Date().toLocaleTimeString([],{
+          hour:"numeric",
+          minute:"2-digit",
+          second:"2-digit"
+        })}`;
 
-    } catch (err) {
+    }catch(err){
 
       console.error(err);
 
@@ -437,11 +462,9 @@
   }
 
   /*
-    GOOGLE SHEET
-    Checks changes every 2 seconds.
-    Does NOT control slideshow position.
+    SHEET REFRESH:
+    This now checks the Google Sheet every 2 seconds.
   */
-
   refresh();
 
   setInterval(
@@ -453,10 +476,9 @@
   );
 
   /*
-    SLIDESHOW
-    Only this advances the card number.
+    FEATURED CARD ROTATION:
+    Move to a different premium hit every 4 seconds.
   */
-
   setInterval(
     rotateFeatured,
     rotationSeconds * 1000
