@@ -31,13 +31,8 @@
       </div>
     </header>
 
-    <section class="guarantee">
-      <div class="guarantee-main">GUARANTEED IR OR BETTER</div>
-      <div class="guarantee-sub">IN EVERY $12 PULL</div>
-    </section>
-
-    <section class="featured-stage" aria-live="polite">
-
+    <!-- LEFT: fixed card area -->
+    <section class="card-zone">
       <div class="featured-image-wrap">
         <img
           id="featuredImage"
@@ -46,40 +41,34 @@
         >
         <div id="featuredTier" class="tier-badge"></div>
       </div>
+    </section>
 
-      <div class="featured-copy">
+    <!-- RIGHT TOP: fixed guarantee area -->
+    <section class="guarantee-zone">
+      <div class="guarantee-card">
+        <div class="guarantee-main">GUARANTEED</div>
+        <div class="guarantee-main">IR OR BETTER</div>
+        <div class="guarantee-sub">IN EVERY PACK</div>
+      </div>
+    </section>
 
-        <div class="featured-label">FEATURED HIT</div>
+    <!-- RIGHT BOTTOM: fixed hit info area -->
+    <section class="info-zone">
+      <div class="featured-label">FEATURED HIT</div>
 
-        <h2 id="featuredName">
-          Loading premium hits...
-        </h2>
+      <h2 id="featuredName">Loading premium hits...</h2>
 
-        <div
-          id="featuredNumber"
-          class="featured-number"
-        ></div>
+      <div id="featuredNumber" class="featured-number"></div>
+      <div id="featuredValue" class="featured-value"></div>
 
-        <div
-          id="featuredValue"
-          class="featured-value"
-        ></div>
-
-        <div class="rotation-progress">
-          <div id="rotationProgress"></div>
-        </div>
-
-        <div
-          id="hitCounter"
-          class="hit-counter"
-        ></div>
-
+      <div class="rotation-progress">
+        <div id="rotationProgress"></div>
       </div>
 
+      <div id="hitCounter" class="hit-counter"></div>
     </section>
 
     <footer class="bottom-bar">
-
       <div class="bottom-item">
         <span class="bottom-label">PRICE</span>
         <strong>$12</strong>
@@ -97,53 +86,26 @@
         <strong id="packsRemaining">0</strong>
         <small>LIVE</small>
       </div>
-
     </footer>
 
     <div class="status-line">
-      <span
-        id="connectionDot"
-        class="connection-dot"
-      ></span>
-
-      <span id="connectionText">
-        Connecting...
-      </span>
-
+      <span id="connectionDot" class="connection-dot"></span>
+      <span id="connectionText">Connecting...</span>
       <span class="divider">•</span>
-
       <span id="lastUpdated"></span>
     </div>
 
   </main>
 
-  <div
-    id="celebration"
-    class="celebration"
-    hidden
-  >
-    <div class="confetti"></div>
-
+  <div id="celebration" class="celebration" hidden>
     <div class="celebration-box">
       <div class="jackpot">BIG HIT!</div>
 
-      <img
-        id="celebrationImage"
-        alt=""
-      >
-
+      <img id="celebrationImage" alt="">
       <h2 id="celebrationName"></h2>
-
-      <div
-        id="celebrationValue"
-        class="celebration-value"
-      ></div>
-
+      <div id="celebrationValue" class="celebration-value"></div>
       <p id="celebrationWinner"></p>
-
-      <small>
-        GOOD KARMA CARDS
-      </small>
+      <small>GOOD KARMA CARDS</small>
     </div>
   </div>
 
