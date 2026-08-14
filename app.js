@@ -12,7 +12,6 @@
     tier: $("featuredTier"),
     counter: $("hitCounter"),
     progress: $("rotationProgress"),
-    packs: $("packsRemaining"),
 
     dot: $("connectionDot"),
     text: $("connectionText"),
@@ -26,7 +25,6 @@
   };
 
   let hits = [];
-  let stats = {};
   let first = true;
 
   let featuredHits = [];
@@ -34,51 +32,65 @@
   let currentFeaturedKey = "";
 
   /*
-    FEATURED CARD ROTATION SPEED
-    The display changes to the next premium hit every 4 seconds.
+    Featured card changes every 4 seconds.
   */
   const rotationSeconds = 4;
 
-  const n = v =>
-    String(v ?? "").trim();
+  const n = value =>
+    String(value ?? "").trim();
 
-  const l = v =>
-    n(v).toLowerCase();
+  const lower = value =>
+    n(value).toLowerCase();
 
-  const sold = x =>
+  const sold = card =>
     c.soldWords.some(
-      w => l(x[c.hitColumns.status]) === l(w)
+      word =>
+        lower(card[c.hitColumns.status]) ===
+        lower(word)
     );
 
-  const shown = x =>
+  const shown = card =>
     c.showWords.some(
-      w => l(x[c.hitColumns.show]) === l(w)
+      word =>
+        lower(card[c.hitColumns.show]) ===
+        lower(word)
     );
 
-  const celebrate = x =>
+  const celebrate = card =>
     c.celebrateWords.some(
-      w => l(x[c.hitColumns.celebrate]) === l(w)
+      word =>
+        lower(card[c.hitColumns.celebrate]) ===
+        lower(word)
     );
 
-  const money = v => {
-    const x = parseFloat(
-      n(v).replace(/[^0-9.-]/g,"")
-    );
+  const money = value => {
 
-    return Number.isFinite(x) ? x : 0;
+    const amount =
+      parseFloat(
+        n(value).replace(/[^0-9.-]/g,"")
+      );
+
+    return Number.isFinite(amount)
+      ? amount
+      : 0;
   };
 
-  const key = x =>
-    `${n(x[c.hitColumns.name])}|${n(x[c.hitColumns.number])}`;
+  const key = card =>
+    `${n(card[c.hitColumns.name])}|${n(card[c.hitColumns.number])}`;
 
-  function connection(ok,msg){
+
+  function connection(ok,message){
+
     e.dot.className =
       `connection-dot ${ok ? "live" : "error"}`;
 
-    e.text.textContent = msg;
+    e.text.textContent =
+      message;
   }
 
+
   function restartProgress(){
+
     e.progress.classList.remove("run");
 
     void e.progress.offsetWidth;
@@ -89,9 +101,11 @@
     e.progress.classList.add("run");
   }
 
+
   function showFeatured(animate=true){
 
     if(!featuredHits.length){
+
       document.body.classList.add(
         "empty-featured"
       );
@@ -109,121 +123,149 @@
       return;
     }
 
+
     document.body.classList.remove(
       "empty-featured"
     );
 
-    featuredIndex = Math.min(
-      featuredIndex,
-      featuredHits.length - 1
-    );
 
-    const x =
+    featuredIndex =
+      Math.min(
+        featuredIndex,
+        featuredHits.length - 1
+      );
+
+
+    const card =
       featuredHits[featuredIndex];
 
-    currentFeaturedKey = key(x);
+
+    currentFeaturedKey =
+      key(card);
+
 
     const apply = () => {
 
       e.image.src =
-        n(x[c.hitColumns.image]);
+        n(card[c.hitColumns.image]);
 
       e.image.alt =
-        n(x[c.hitColumns.name]);
+        n(card[c.hitColumns.name]);
+
 
       e.image.onerror = () => {
         e.image.style.opacity = .12;
       };
 
+
       e.image.onload = () => {
         e.image.style.opacity = "";
       };
 
+
       e.name.textContent =
-        n(x[c.hitColumns.name]) ||
+        n(card[c.hitColumns.name]) ||
         "Premium Hit";
 
+
       e.number.textContent =
-        n(x[c.hitColumns.number]);
+        n(card[c.hitColumns.number]);
+
 
       e.value.textContent =
-        n(x[c.hitColumns.value]);
+        n(card[c.hitColumns.value]);
+
 
       e.tier.textContent =
-        n(x[c.hitColumns.tier]);
+        n(card[c.hitColumns.tier]);
+
 
       e.counter.textContent =
-        `${featuredIndex + 1} OF ${featuredHits.length} HITS LEFT`;
+        `${featuredIndex + 1} OF ${featuredHits.length} PREMIUM HITS LEFT`;
+
 
       e.image.classList.remove(
         "changing"
       );
 
+
       restartProgress();
     };
 
+
     if(animate){
+
       e.image.classList.add(
         "changing"
       );
 
-      setTimeout(apply,180);
+      setTimeout(
+        apply,
+        180
+      );
+
     }else{
+
       apply();
     }
   }
 
+
   function rotateFeatured(){
 
     if(featuredHits.length <= 1){
+
       restartProgress();
+
       return;
     }
+
 
     featuredIndex =
       (featuredIndex + 1) %
       featuredHits.length;
 
+
     showFeatured(true);
   }
+
 
   function render(){
 
     const previousKey =
       currentFeaturedKey;
 
-    /*
-      Only show hits that:
-      1. are marked Show on Board
-      2. have NOT been sold/pulled/claimed
 
-      Highest-value hits are shown first.
-    */
-    featuredHits = hits
-      .filter(
-        x => shown(x) && !sold(x)
-      )
-      .sort(
-        (a,b) =>
-          money(b[c.hitColumns.value]) -
-          money(a[c.hitColumns.value])
-      );
+    featuredHits =
+      hits
+        .filter(
+          card =>
+            shown(card) &&
+            !sold(card)
+        )
+        .sort(
+          (a,b) =>
+            money(b[c.hitColumns.value]) -
+            money(a[c.hitColumns.value])
+        );
 
-    /*
-      Keep the same card on screen
-      when the Sheet refreshes,
-      unless that card was just sold.
-    */
+
     if(previousKey){
 
       const stillHere =
         featuredHits.findIndex(
-          x => key(x) === previousKey
+          card =>
+            key(card) === previousKey
         );
 
+
       if(stillHere >= 0){
-        featuredIndex = stillHere;
+
+        featuredIndex =
+          stillHere;
+
       }else{
+
         featuredIndex =
           featuredIndex %
           Math.max(
@@ -233,41 +275,44 @@
       }
 
     }else{
+
       featuredIndex = 0;
     }
 
-    if(e.packs){
-      e.packs.textContent =
-        stats[c.statsKeys.packsRemaining] ||
-        "0";
-    }
 
     showFeatured(false);
   }
 
-  function showCelebration(x){
+
+  function showCelebration(card){
 
     e.ci.src =
-      n(x[c.hitColumns.image]);
+      n(card[c.hitColumns.image]);
+
 
     e.cn.textContent =
-      n(x[c.hitColumns.name]) ||
+      n(card[c.hitColumns.name]) ||
       "BIG HIT!";
 
+
     if(e.cv){
+
       e.cv.textContent =
-        n(x[c.hitColumns.value]);
+        n(card[c.hitColumns.value]);
     }
+
 
     if(e.cw){
 
       const winnerColumn =
         c.hitColumns.winner;
 
+
       const winner =
         winnerColumn
-          ? n(x[winnerColumn])
+          ? n(card[winnerColumn])
           : "";
+
 
       e.cw.textContent =
         winner
@@ -275,44 +320,57 @@
           : "Congratulations!";
     }
 
-    e.celebration.hidden = false;
+
+    e.celebration.hidden =
+      false;
+
 
     setTimeout(
       () => {
         e.celebration.hidden = true;
       },
-      (Number(c.celebrationSeconds) || 6)
-        * 1000
+      (
+        Number(c.celebrationSeconds) ||
+        6
+      ) * 1000
     );
   }
 
-  function detect(prev,now){
+
+  function detect(previous,current){
 
     if(first){
       return;
     }
 
-    const old =
+
+    const previouslySold =
       new Set(
-        prev
+        previous
           .filter(sold)
           .map(key)
       );
 
-    const fresh =
-      now.filter(
-        x =>
-          sold(x) &&
-          celebrate(x) &&
-          !old.has(key(x))
+
+    const newCelebrations =
+      current.filter(
+        card =>
+          sold(card) &&
+          celebrate(card) &&
+          !previouslySold.has(
+            key(card)
+          )
       );
 
-    if(fresh.length){
+
+    if(newCelebrations.length){
+
       showCelebration(
-        fresh[0]
+        newCelebrations[0]
       );
     }
   }
+
 
   async function fetchSheet(gid){
 
@@ -323,7 +381,8 @@
       `&tq=${encodeURIComponent("select *")}` +
       `&cacheBust=${Date.now()}`;
 
-    const r =
+
+    const response =
       await fetch(
         url,
         {
@@ -331,153 +390,164 @@
         }
       );
 
-    if(!r.ok){
+
+    if(!response.ok){
+
       throw Error(
-        `Google Sheet request failed (${r.status}).`
+        `Google Sheet request failed (${response.status}).`
       );
     }
 
-    const t =
-      await r.text();
+
+    const text =
+      await response.text();
+
 
     const start =
-      t.indexOf("{");
+      text.indexOf("{");
+
 
     const end =
-      t.lastIndexOf("}");
+      text.lastIndexOf("}");
+
 
     if(start < 0 || end < 0){
+
       throw Error(
         "Google Sheet returned unreadable data."
       );
     }
 
-    const p =
+
+    const payload =
       JSON.parse(
-        t.slice(
+        text.slice(
           start,
           end + 1
         )
       );
 
-    const h =
-      p.table.cols.map(
-        (x,i) =>
-          n(x.label) ||
-          `Column ${i + 1}`
+
+    const headers =
+      payload.table.cols.map(
+        (column,index) =>
+          n(column.label) ||
+          `Column ${index + 1}`
       );
 
-    return p.table.rows.map(
+
+    return payload.table.rows.map(
       row => {
 
-        const o = {};
+        const item = {};
 
-        h.forEach(
-          (k,i) => {
+
+        headers.forEach(
+          (header,index) => {
 
             const cell =
-              row.c?.[i];
+              row.c?.[index];
 
-            o[k] =
+
+            item[header] =
               cell?.f ??
               cell?.v ??
               "";
           }
         );
 
-        return o;
+
+        return item;
       }
     );
   }
+
 
   async function refresh(){
 
     try{
 
-      const prev =
+      const previous =
         hits.slice();
 
-      const [hr,sr] =
-        await Promise.all([
-          fetchSheet(c.hitsGid),
-          fetchSheet(c.statsGid)
-        ]);
+
+      const rows =
+        await fetchSheet(
+          c.hitsGid
+        );
+
 
       hits =
-        hr.filter(
-          x =>
+        rows.filter(
+          card =>
             n(
-              x[c.hitColumns.name]
+              card[c.hitColumns.name]
             )
         );
 
-      stats = {};
-
-      sr.forEach(
-        x => {
-
-          const values =
-            Object.values(x);
-
-          if(
-            values.length > 1 &&
-            n(values[0])
-          ){
-            stats[n(values[0])] =
-              n(values[1]);
-          }
-        }
-      );
 
       detect(
-        prev,
+        previous,
         hits
       );
 
+
       render();
 
-      first = false;
+
+      first =
+        false;
+
 
       connection(
         true,
         "Google Sheet live"
       );
 
+
       e.updated.textContent =
-        `Updated ${new Date().toLocaleTimeString([],{
-          hour:"numeric",
-          minute:"2-digit",
-          second:"2-digit"
-        })}`;
+        `Updated ${new Date().toLocaleTimeString(
+          [],
+          {
+            hour:"numeric",
+            minute:"2-digit",
+            second:"2-digit"
+          }
+        )}`;
 
-    }catch(err){
+    }catch(error){
 
-      console.error(err);
+      console.error(
+        error
+      );
+
 
       connection(
         false,
-        err.message
+        error.message
       );
     }
   }
 
+
   /*
-    SHEET REFRESH:
-    This now checks the Google Sheet every 2 seconds.
+    Fetch fresh Google Sheet data every 2 seconds.
   */
   refresh();
+
 
   setInterval(
     refresh,
     Math.max(
       2,
-      Number(c.refreshSeconds) || 2
+      Number(c.refreshSeconds) ||
+      2
     ) * 1000
   );
 
+
   /*
-    FEATURED CARD ROTATION:
-    Move to a different premium hit every 4 seconds.
+    Rotate featured card every 4 seconds.
   */
   setInterval(
     rotateFeatured,
