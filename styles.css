@@ -1,13 +1,10 @@
 :root{
   --black:#070707;
-  --panel:#111111;
-  --panel2:#181818;
   --white:#ffffff;
   --muted:#b9b9b9;
   --yellow:#ffd400;
   --green:#3de58a;
   --red:#ff3b30;
-  --line:#303030;
 }
 
 *{
@@ -22,45 +19,39 @@ body{
 }
 
 body{
+  overflow:hidden;
   background:
     radial-gradient(circle at 12% 15%,rgba(255,212,0,.10),transparent 28%),
     radial-gradient(circle at 86% 84%,rgba(255,212,0,.06),transparent 30%),
     var(--black);
-
   color:var(--white);
   font-family:Inter,Arial,sans-serif;
-  overflow:hidden;
 }
 
 /*
-  IMPORTANT:
-  The whole page is now a fixed viewport layout.
-  The guarantee is absolutely positioned and is NOT allowed
-  to move when card names/images change.
+  LOCKED VIEWPORT LAYOUT
+  Nothing in the rotating card content is allowed to move the guarantee.
 */
 .stream-display{
   position:relative;
-
   width:100vw;
   height:100vh;
-
-  display:grid;
-  grid-template-rows:82px 165px minmax(0,1fr) 104px 20px;
-  gap:14px;
-
-  padding:22px 28px 16px;
+  overflow:hidden;
 }
 
+/* HEADER */
 .stream-header{
-  min-height:82px;
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:110px;
 
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:24px;
 
-  padding-bottom:14px;
-
+  padding:20px 28px 16px;
   border-bottom:4px solid var(--yellow);
 }
 
@@ -74,23 +65,18 @@ body{
   width:64px;
   height:64px;
   border-radius:15px;
-
   display:grid;
   place-items:center;
   flex:0 0 auto;
 
   background:var(--yellow);
   color:#000;
-
   font-size:25px;
   font-weight:900;
-
-  box-shadow:0 0 28px rgba(255,212,0,.22);
 }
 
 .eyebrow{
   color:var(--yellow);
-
   font-size:14px;
   font-weight:900;
   letter-spacing:.18em;
@@ -98,8 +84,7 @@ body{
 
 h1{
   margin:3px 0 0;
-
-  font-size:clamp(30px,3.3vw,58px);
+  font-size:56px;
   line-height:.95;
   letter-spacing:-.045em;
 }
@@ -110,7 +95,6 @@ h1{
   gap:8px;
 
   padding:10px 15px;
-
   border:2px solid #666;
   border-radius:999px;
 
@@ -121,110 +105,29 @@ h1{
 .live-dot{
   width:12px;
   height:12px;
-
   border-radius:50%;
-
   background:var(--green);
   box-shadow:0 0 13px var(--green);
 }
 
 /*
-  GUARANTEE
-
-  This is now anchored to the PAGE, not the card area.
-
-  Change ONLY "top" if you ever want it higher/lower.
+  LEFT CARD ZONE
+  Fixed rectangle. Card changes never alter any other zone.
 */
-.guarantee{
+.card-zone{
   position:absolute;
 
-  top:105px;
-  left:50%;
+  left:42px;
+  top:145px;
 
-  width:100%;
+  width:43vw;
+  height:calc(100vh - 145px - 175px);
 
-  transform:translateX(-50%);
+  min-width:420px;
 
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
-
-  text-align:center;
-
-  padding:0;
-  margin:0;
-
-  z-index:20;
-
-  pointer-events:none;
-}
-
-.guarantee-main{
-  display:block;
-
-  width:100%;
-  margin:0;
-
-  text-align:center;
-
-  font-size:56px;
-  line-height:56px;
-  font-weight:900;
-
-  letter-spacing:-1.5px;
-
-  color:var(--white);
-
-  white-space:nowrap;
-}
-
-.guarantee-sub{
-  display:block;
-
-  width:100%;
-  margin:9px 0 0;
-
-  text-align:center;
-
-  font-size:32px;
-  line-height:32px;
-  font-weight:900;
-
-  letter-spacing:1.2px;
-
-  color:var(--yellow);
-
-  white-space:nowrap;
-}
-
-/*
-  This empty second grid row is intentional.
-  It reserves space for the absolutely-positioned guarantee
-  so the featured card can never push it around.
-*/
-.featured-stage{
-  grid-row:3;
-
-  min-width:0;
-  min-height:0;
-
-  display:grid;
-
-  /*
-    Fixed proportional columns prevent different image sizes
-    from changing the text position.
-  */
-  grid-template-columns:44% 56%;
-
-  gap:54px;
-
-  align-items:center;
-
-  width:min(1500px,100%);
-  height:100%;
-
-  margin:0 auto;
 }
 
 .featured-image-wrap{
@@ -233,25 +136,16 @@ h1{
   width:100%;
   height:100%;
 
-  min-width:0;
-  min-height:0;
-
   display:flex;
   align-items:center;
   justify-content:center;
 }
 
 .featured-image{
-  display:block;
-
-  /*
-    Fixed bounding box means every card occupies the same
-    visual area regardless of the original image dimensions.
-  */
   width:100%;
   height:100%;
 
-  max-width:520px;
+  max-width:620px;
   max-height:100%;
 
   object-fit:contain;
@@ -259,9 +153,6 @@ h1{
   filter:
     drop-shadow(0 16px 30px rgba(0,0,0,.55))
     drop-shadow(0 0 18px rgba(255,212,0,.08));
-
-  opacity:1;
-  transform:scale(1);
 
   transition:
     opacity .18s ease,
@@ -276,10 +167,10 @@ h1{
 .tier-badge{
   position:absolute;
 
-  top:22px;
-  left:22px;
+  top:18px;
+  left:18px;
 
-  max-width:88%;
+  max-width:90%;
 
   padding:8px 12px;
 
@@ -292,7 +183,6 @@ h1{
   font-size:18px;
   font-weight:900;
   letter-spacing:.08em;
-
   text-transform:uppercase;
 }
 
@@ -300,119 +190,194 @@ h1{
   display:none;
 }
 
-.featured-copy{
-  width:100%;
-  height:100%;
+/*
+  RIGHT TOP GUARANTEE
+  This is now a completely independent fixed rectangle.
+*/
+.guarantee-zone{
+  position:absolute;
 
-  min-width:0;
-  min-height:0;
+  top:145px;
+  right:46px;
+
+  width:48vw;
+  height:225px;
+
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
+
+.guarantee-card{
+  width:100%;
+  height:205px;
 
   display:flex;
   flex-direction:column;
-  justify-content:center;
   align-items:flex-start;
+  justify-content:center;
 
-  /*
-    Fixes the text starting point so every Pokémon begins
-    in the exact same location.
-  */
-  padding:0 18px 0 0;
+  padding:18px 28px 16px;
+
+  background:var(--yellow);
+  border:4px solid #f8f8f8;
+  border-radius:24px;
+
+  box-shadow:
+    0 0 0 3px rgba(0,0,0,.75),
+    0 0 24px rgba(255,212,0,.28);
+
+  transform:none;
+}
+
+.guarantee-main{
+  width:100%;
+  margin:0;
+
+  color:#050505;
+
+  font-size:58px;
+  line-height:.92;
+  font-weight:900;
+  letter-spacing:-2px;
+
+  text-align:left;
+  white-space:nowrap;
+}
+
+.guarantee-sub{
+  width:100%;
+  margin-top:11px;
+
+  color:#111;
+
+  font-size:34px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-1px;
+
+  text-align:left;
+  white-space:nowrap;
+}
+
+/*
+  RIGHT BOTTOM HIT INFO
+  Fixed rectangle beneath guarantee.
+*/
+.info-zone{
+  position:absolute;
+
+  top:390px;
+  right:46px;
+
+  width:48vw;
+  height:calc(100vh - 390px - 175px);
+
+  min-height:260px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:flex-start;
+
+  padding:0;
+  overflow:hidden;
 }
 
 .featured-label{
   width:100%;
+  height:38px;
 
-  margin:0 0 12px;
+  display:flex;
+  align-items:center;
+
+  margin:0 0 8px;
 
   color:var(--yellow);
 
-  font-size:30px;
-  line-height:30px;
+  font-size:28px;
+  line-height:28px;
   font-weight:900;
-
   letter-spacing:.08em;
 
   text-align:left;
 }
 
 /*
-  Featured name now has a FIXED box.
-  Longer/shorter Pokémon names cannot move anything above/below it.
+  Fixed name box.
+  Long names wrap INSIDE this box.
+  Nothing above or below can move.
 */
 #featuredName{
   width:100%;
-  height:190px;
+  height:205px;
 
   margin:0;
 
   display:flex;
-  align-items:center;
+  align-items:flex-start;
   justify-content:flex-start;
 
-  font-size:96px;
-  line-height:.92;
-
-  font-weight:900;
-  letter-spacing:-.065em;
-
   overflow:hidden;
-  overflow-wrap:anywhere;
+
+  color:var(--white);
+
+  font-size:72px;
+  line-height:.98;
+  font-weight:900;
+  letter-spacing:-.055em;
 
   text-align:left;
+  overflow-wrap:anywhere;
 }
 
 .featured-number{
   width:100%;
-  height:48px;
-
-  margin:12px 0 0;
+  height:46px;
 
   display:flex;
   align-items:center;
 
+  margin:0;
+
   color:var(--muted);
 
-  font-size:36px;
-  line-height:36px;
+  font-size:34px;
+  line-height:34px;
   font-weight:800;
-
-  text-align:left;
 }
 
 .featured-value{
   width:100%;
-  height:58px;
-
-  margin:2px 0 0;
+  height:50px;
 
   display:flex;
   align-items:center;
 
+  margin:0;
+
   color:var(--yellow);
 
-  font-size:44px;
-  line-height:44px;
+  font-size:42px;
+  line-height:42px;
   font-weight:900;
-
-  text-align:left;
 }
 
 .rotation-progress{
-  width:min(720px,100%);
+  width:82%;
   height:12px;
 
-  margin-top:18px;
+  margin-top:8px;
 
   overflow:hidden;
 
-  background:#8d8d8d;
+  background:#858585;
   border-radius:999px;
 }
 
 .rotation-progress > div{
   width:0;
   height:100%;
-
   background:var(--yellow);
   border-radius:999px;
 }
@@ -430,55 +395,48 @@ h1{
 
 .hit-counter{
   width:100%;
-  height:36px;
-
-  margin-top:10px;
+  height:34px;
 
   display:flex;
   align-items:center;
 
+  margin-top:8px;
+
   color:var(--white);
 
-  font-size:27px;
-  line-height:27px;
+  font-size:24px;
+  line-height:24px;
   font-weight:900;
-
-  text-align:left;
 }
 
+/* FIXED BOTTOM BAR */
 .bottom-bar{
-  grid-row:4;
+  position:absolute;
+
+  left:28px;
+  right:28px;
+  bottom:32px;
+
+  height:118px;
 
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:14px;
-
-  width:min(1500px,100%);
-  height:104px;
-
-  margin:0 auto;
 }
 
 .bottom-item{
-  height:104px;
+  height:118px;
 
   display:grid;
-
   grid-template-columns:auto 1fr;
   grid-template-rows:1fr 1fr;
 
   column-gap:14px;
-
   align-items:center;
 
   padding:14px 18px;
 
-  background:
-    linear-gradient(
-      180deg,
-      #1a1a1a,
-      #101010
-    );
+  background:linear-gradient(180deg,#1a1a1a,#101010);
 
   border:2px solid #383838;
   border-radius:17px;
@@ -526,16 +484,20 @@ h1{
   letter-spacing:.10em;
 }
 
+/* STATUS */
 .status-line{
-  grid-row:5;
+  position:absolute;
+
+  left:0;
+  right:0;
+  bottom:8px;
+
+  height:18px;
 
   display:flex;
   justify-content:center;
   align-items:center;
-
   gap:8px;
-
-  height:20px;
 
   color:#777;
   font-size:11px;
@@ -546,7 +508,6 @@ h1{
   height:8px;
 
   border-radius:50%;
-
   background:#777;
 }
 
@@ -564,10 +525,10 @@ h1{
   color:#555;
 }
 
+/* CELEBRATION */
 .celebration{
   position:fixed;
   inset:0;
-
   z-index:999;
 
   display:grid;
@@ -582,21 +543,15 @@ h1{
 
 .celebration::before{
   content:"";
-
   position:absolute;
   inset:0;
 
   background:
-    radial-gradient(
-      circle at center,
-      rgba(255,212,0,.18),
-      transparent 48%
-    );
+    radial-gradient(circle at center,rgba(255,212,0,.18),transparent 48%);
 }
 
 .celebration-box{
   position:relative;
-
   z-index:2;
 
   width:min(700px,88vw);
@@ -620,11 +575,7 @@ h1{
 
   object-fit:contain;
 
-  filter:
-    drop-shadow(
-      0 18px 35px
-      rgba(0,0,0,.55)
-    );
+  filter:drop-shadow(0 18px 35px rgba(0,0,0,.55));
 }
 
 .celebration-box h2{
@@ -652,104 +603,124 @@ h1{
 
 .celebration-box small{
   color:var(--yellow);
-
   font-weight:900;
   letter-spacing:.16em;
 }
 
+/* Empty state keeps the same geometry */
 .empty-featured .featured-image-wrap{
   visibility:hidden;
 }
 
-.empty-featured .featured-stage{
-  grid-template-columns:44% 56%;
-}
-
 /*
-  Smaller display fallback.
-  Still uses FIXED values so nothing jumps around.
+  FALLBACK FOR SMALLER MONITORS
+  Still uses fixed independent zones.
 */
-@media (max-width:1100px){
-
-  .stream-display{
-    grid-template-rows:66px 135px minmax(0,1fr) 88px 20px;
-
-    gap:10px;
-
-    padding:15px 18px 12px;
-  }
+@media (max-width:1200px){
 
   .stream-header{
-    min-height:66px;
+    height:92px;
+    padding:14px 20px 12px;
+  }
+
+  h1{
+    font-size:46px;
   }
 
   .logo{
-    width:52px;
-    height:52px;
-
-    font-size:20px;
+    width:54px;
+    height:54px;
+    font-size:21px;
   }
 
-  .guarantee{
-    top:84px;
+  .card-zone{
+    left:24px;
+    top:122px;
+
+    width:42vw;
+    height:calc(100vh - 122px - 155px);
+
+    min-width:0;
+  }
+
+  .guarantee-zone{
+    top:122px;
+    right:28px;
+
+    width:50vw;
+    height:190px;
+  }
+
+  .guarantee-card{
+    height:175px;
+    padding:15px 22px;
+    border-radius:20px;
   }
 
   .guarantee-main{
-    font-size:44px;
-    line-height:44px;
+    font-size:46px;
+    line-height:.93;
   }
 
   .guarantee-sub{
-    margin-top:7px;
-
-    font-size:27px;
-    line-height:27px;
+    font-size:28px;
   }
 
-  .featured-stage{
-    grid-template-columns:42% 58%;
-    gap:28px;
-  }
+  .info-zone{
+    top:325px;
+    right:28px;
 
-  #featuredName{
-    height:150px;
-
-    font-size:76px;
+    width:50vw;
+    height:calc(100vh - 325px - 155px);
   }
 
   .featured-label{
-    font-size:24px;
-    line-height:24px;
+    height:32px;
+    font-size:23px;
+    line-height:23px;
+  }
+
+  #featuredName{
+    height:160px;
+
+    font-size:58px;
   }
 
   .featured-number{
-    height:40px;
+    height:38px;
 
-    font-size:30px;
-    line-height:30px;
+    font-size:28px;
+    line-height:28px;
   }
 
   .featured-value{
-    height:48px;
+    height:42px;
 
-    font-size:36px;
-    line-height:36px;
+    font-size:34px;
+    line-height:34px;
   }
 
   .hit-counter{
-    height:30px;
+    height:28px;
 
-    font-size:22px;
-    line-height:22px;
+    font-size:20px;
+    line-height:20px;
   }
 
-  .bottom-bar,
+  .bottom-bar{
+    left:18px;
+    right:18px;
+    bottom:28px;
+
+    height:98px;
+  }
+
   .bottom-item{
-    height:88px;
+    height:98px;
   }
 
   .bottom-item strong{
-    font-size:38px;
-    line-height:38px;
+    font-size:40px;
+    line-height:40px;
   }
 }
