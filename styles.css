@@ -1,9 +1,9 @@
 :root{
   --black:#070707;
   --white:#ffffff;
-  --muted:#b9b9b9;
+  --muted:#a9a9a9;
   --yellow:#ffd400;
-  --green:#3de58a;
+  --green:#36e58a;
   --red:#ff3b30;
 }
 
@@ -21,71 +21,103 @@ body{
 body{
   overflow:hidden;
   background:
-    radial-gradient(circle at 12% 15%,rgba(255,212,0,.10),transparent 28%),
-    radial-gradient(circle at 86% 84%,rgba(255,212,0,.06),transparent 30%),
-    var(--black);
+    radial-gradient(
+      circle at 15% 20%,
+      rgba(255,212,0,.08),
+      transparent 28%
+    ),
+    #070707;
+
   color:var(--white);
   font-family:Inter,Arial,sans-serif;
 }
 
-/*
-  LOCKED VIEWPORT LAYOUT
-  Nothing in the rotating card content is allowed to move the guarantee.
-*/
-.stream-display{
+
+/* =====================================================
+   ENTIRE SCREEN
+   Everything below uses absolute positioning.
+   Rotating content cannot move any other section.
+   ===================================================== */
+
+.live-page{
   position:relative;
   width:100vw;
   height:100vh;
   overflow:hidden;
 }
 
-/* HEADER */
-.stream-header{
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.topbar{
   position:absolute;
+
   top:0;
   left:0;
   right:0;
-  height:110px;
+
+  height:108px;
 
   display:flex;
   align-items:center;
   justify-content:space-between;
 
-  padding:20px 28px 16px;
+  padding:18px 28px;
+
   border-bottom:4px solid var(--yellow);
 }
 
-.brand-lockup{
+.brand{
   display:flex;
   align-items:center;
-  gap:15px;
+  gap:14px;
 }
 
-.logo{
-  width:64px;
-  height:64px;
-  border-radius:15px;
+.brand-mark{
+  width:62px;
+  height:62px;
+
+  flex:0 0 62px;
+
   display:grid;
   place-items:center;
-  flex:0 0 auto;
+
+  border-radius:15px;
 
   background:var(--yellow);
   color:#000;
-  font-size:25px;
+
+  font-size:24px;
   font-weight:900;
+}
+
+.brand-copy{
+  display:block;
 }
 
 .eyebrow{
+  margin:0 0 3px;
+
   color:var(--yellow);
-  font-size:14px;
+
+  font-size:13px;
+  line-height:1;
   font-weight:900;
-  letter-spacing:.18em;
+
+  letter-spacing:.17em;
 }
 
 h1{
-  margin:3px 0 0;
-  font-size:56px;
-  line-height:.95;
+  margin:0;
+
+  color:#fff;
+
+  font-size:52px;
+  line-height:1;
+
+  font-weight:900;
   letter-spacing:-.045em;
 }
 
@@ -94,65 +126,72 @@ h1{
   align-items:center;
   gap:8px;
 
-  padding:10px 15px;
-  border:2px solid #666;
+  padding:9px 14px;
+
+  border:2px solid #777;
   border-radius:999px;
 
-  font-size:15px;
+  color:#fff;
+
+  font-size:14px;
   font-weight:900;
 }
 
 .live-dot{
-  width:12px;
-  height:12px;
+  width:11px;
+  height:11px;
+
   border-radius:50%;
+
   background:var(--green);
-  box-shadow:0 0 13px var(--green);
+
+  box-shadow:
+    0 0 12px var(--green);
 }
 
-/*
-  LEFT CARD ZONE
-  Fixed rectangle. Card changes never alter any other zone.
-*/
-.card-zone{
+
+/* =====================================================
+   LEFT CARD
+   This rectangle NEVER changes size or location.
+   ===================================================== */
+
+.card-area{
   position:absolute;
 
-  left:42px;
-  top:145px;
+  top:138px;
+  left:36px;
 
-  width:43vw;
-  height:calc(100vh - 145px - 175px);
-
-  min-width:420px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  width:43%;
+  height:calc(100vh - 180px);
 }
 
-.featured-image-wrap{
+.card-frame{
   position:relative;
 
   width:100%;
   height:100%;
 
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
 }
 
 .featured-image{
+  display:block;
+
   width:100%;
   height:100%;
 
-  max-width:620px;
+  max-width:650px;
   max-height:100%;
 
   object-fit:contain;
 
+  opacity:1;
+  transform:scale(1);
+
   filter:
-    drop-shadow(0 16px 30px rgba(0,0,0,.55))
-    drop-shadow(0 0 18px rgba(255,212,0,.08));
+    drop-shadow(0 18px 34px rgba(0,0,0,.60));
 
   transition:
     opacity .18s ease,
@@ -160,68 +199,73 @@ h1{
 }
 
 .featured-image.changing{
-  opacity:.15;
-  transform:scale(.975);
+  opacity:.12;
+  transform:scale(.98);
 }
 
 .tier-badge{
   position:absolute;
 
-  top:18px;
-  left:18px;
+  top:14px;
+  left:12px;
 
-  max-width:90%;
-
-  padding:8px 12px;
+  padding:7px 12px;
 
   border:2px solid var(--yellow);
   border-radius:999px;
 
-  background:rgba(0,0,0,.86);
+  background:rgba(5,5,5,.90);
   color:var(--yellow);
 
-  font-size:18px;
+  font-size:16px;
   font-weight:900;
-  letter-spacing:.08em;
-  text-transform:uppercase;
+
+  letter-spacing:.04em;
 }
 
 .tier-badge:empty{
   display:none;
 }
 
-/*
-  RIGHT TOP GUARANTEE
-  This is now a completely independent fixed rectangle.
-*/
-.guarantee-zone{
+
+/* =====================================================
+   GUARANTEE
+   COMPLETELY STATIC.
+
+   It has fixed TOP / RIGHT / WIDTH / HEIGHT values.
+   The card name and card image CANNOT affect this.
+   ===================================================== */
+
+.guarantee-area{
   position:absolute;
 
-  top:145px;
-  right:46px;
+  top:142px;
+  right:42px;
 
-  width:48vw;
-  height:225px;
-
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
+  width:48%;
+  height:220px;
 }
 
-.guarantee-card{
+.guarantee-box{
+  position:absolute;
+
+  top:0;
+  left:0;
+
   width:100%;
-  height:205px;
+  height:210px;
 
   display:flex;
   flex-direction:column;
-  align-items:flex-start;
   justify-content:center;
+  align-items:flex-start;
 
-  padding:18px 28px 16px;
+  padding:18px 30px 16px;
+
+  border:4px solid #f5f5f5;
+  border-radius:24px;
 
   background:var(--yellow);
-  border:4px solid #f8f8f8;
-  border-radius:24px;
 
   box-shadow:
     0 0 0 3px rgba(0,0,0,.75),
@@ -230,311 +274,295 @@ h1{
   transform:none;
 }
 
-.guarantee-main{
+.guarantee-line{
   width:100%;
+  height:58px;
+
   margin:0;
 
-  color:#050505;
+  display:flex;
+  align-items:center;
+
+  color:#080808;
 
   font-size:58px;
-  line-height:.92;
+  line-height:58px;
+
   font-weight:900;
+
   letter-spacing:-2px;
 
-  text-align:left;
   white-space:nowrap;
 }
 
-.guarantee-sub{
+.guarantee-small{
   width:100%;
-  margin-top:11px;
+  height:42px;
 
-  color:#111;
-
-  font-size:34px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:-1px;
-
-  text-align:left;
-  white-space:nowrap;
-}
-
-/*
-  RIGHT BOTTOM HIT INFO
-  Fixed rectangle beneath guarantee.
-*/
-.info-zone{
-  position:absolute;
-
-  top:390px;
-  right:46px;
-
-  width:48vw;
-  height:calc(100vh - 390px - 175px);
-
-  min-height:260px;
+  margin-top:5px;
 
   display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  justify-content:flex-start;
+  align-items:center;
 
-  padding:0;
+  color:#101010;
+
+  font-size:35px;
+  line-height:35px;
+
+  font-weight:900;
+
+  letter-spacing:-1px;
+
+  white-space:nowrap;
+}
+
+
+/* =====================================================
+   HIT INFORMATION
+   COMPLETELY INDEPENDENT OF GUARANTEE.
+   ===================================================== */
+
+.hit-area{
+  position:absolute;
+
+  top:385px;
+  right:42px;
+
+  width:48%;
+  height:calc(100vh - 420px);
+
   overflow:hidden;
 }
 
 .featured-label{
-  width:100%;
-  height:38px;
+  position:absolute;
 
-  display:flex;
-  align-items:center;
+  top:0;
+  left:0;
 
-  margin:0 0 8px;
-
-  color:var(--yellow);
-
-  font-size:28px;
-  line-height:28px;
-  font-weight:900;
-  letter-spacing:.08em;
-
-  text-align:left;
-}
-
-/*
-  Fixed name box.
-  Long names wrap INSIDE this box.
-  Nothing above or below can move.
-*/
-#featuredName{
-  width:100%;
-  height:205px;
-
-  margin:0;
-
-  display:flex;
-  align-items:flex-start;
-  justify-content:flex-start;
-
-  overflow:hidden;
-
-  color:var(--white);
-
-  font-size:72px;
-  line-height:.98;
-  font-weight:900;
-  letter-spacing:-.055em;
-
-  text-align:left;
-  overflow-wrap:anywhere;
-}
-
-.featured-number{
-  width:100%;
-  height:46px;
-
-  display:flex;
-  align-items:center;
-
-  margin:0;
-
-  color:var(--muted);
-
-  font-size:34px;
-  line-height:34px;
-  font-weight:800;
-}
-
-.featured-value{
-  width:100%;
-  height:50px;
-
-  display:flex;
-  align-items:center;
-
-  margin:0;
-
-  color:var(--yellow);
-
-  font-size:42px;
-  line-height:42px;
-  font-weight:900;
-}
-
-.rotation-progress{
-  width:82%;
-  height:12px;
-
-  margin-top:8px;
-
-  overflow:hidden;
-
-  background:#858585;
-  border-radius:999px;
-}
-
-.rotation-progress > div{
-  width:0;
-  height:100%;
-  background:var(--yellow);
-  border-radius:999px;
-}
-
-.rotation-progress > div.run{
-  animation-name:rotationFill;
-  animation-timing-function:linear;
-  animation-fill-mode:forwards;
-}
-
-@keyframes rotationFill{
-  from{width:0}
-  to{width:100%}
-}
-
-.hit-counter{
   width:100%;
   height:34px;
 
   display:flex;
   align-items:center;
 
-  margin-top:8px;
-
-  color:var(--white);
-
-  font-size:24px;
-  line-height:24px;
-  font-weight:900;
-}
-
-/* FIXED BOTTOM BAR */
-.bottom-bar{
-  position:absolute;
-
-  left:28px;
-  right:28px;
-  bottom:32px;
-
-  height:118px;
-
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
-
-.bottom-item{
-  height:118px;
-
-  display:grid;
-  grid-template-columns:auto 1fr;
-  grid-template-rows:1fr 1fr;
-
-  column-gap:14px;
-  align-items:center;
-
-  padding:14px 18px;
-
-  background:linear-gradient(180deg,#1a1a1a,#101010);
-
-  border:2px solid #383838;
-  border-radius:17px;
-}
-
-.bottom-label{
-  grid-column:1;
-  grid-row:1 / span 2;
-
   color:var(--yellow);
 
-  font-size:13px;
-  font-weight:900;
-  letter-spacing:.13em;
+  font-size:26px;
+  line-height:26px;
 
-  writing-mode:vertical-rl;
-  transform:rotate(180deg);
+  font-weight:900;
+
+  letter-spacing:.08em;
 }
 
-.bottom-item strong{
-  grid-column:2;
-  grid-row:1;
 
-  align-self:end;
+/*
+  The card name lives inside a fixed rectangle.
+  One-line or three-line names occupy this SAME box.
+*/
+#featuredName{
+  position:absolute;
 
-  color:var(--white);
+  top:42px;
+  left:0;
 
-  font-size:48px;
-  line-height:48px;
+  width:100%;
+  height:205px;
+
+  margin:0;
+
+  overflow:hidden;
+
+  display:flex;
+  align-items:flex-start;
+
+  color:#fff;
+
+  font-size:68px;
+  line-height:1.01;
+
   font-weight:900;
+
+  letter-spacing:-.055em;
+
+  overflow-wrap:anywhere;
 }
 
-.bottom-item small{
-  grid-column:2;
-  grid-row:2;
+.featured-number{
+  position:absolute;
 
-  align-self:start;
+  top:252px;
+  left:0;
 
-  margin-top:5px;
+  width:100%;
+  height:42px;
+
+  display:flex;
+  align-items:center;
 
   color:var(--muted);
 
-  font-size:13px;
+  font-size:29px;
+  line-height:29px;
+
   font-weight:800;
-  letter-spacing:.10em;
 }
 
-/* STATUS */
-.status-line{
+.featured-value{
   position:absolute;
 
+  top:294px;
   left:0;
-  right:0;
-  bottom:8px;
 
-  height:18px;
+  width:100%;
+  height:46px;
 
   display:flex;
-  justify-content:center;
   align-items:center;
-  gap:8px;
 
-  color:#777;
-  font-size:11px;
+  color:var(--yellow);
+
+  font-size:36px;
+  line-height:36px;
+
+  font-weight:900;
+}
+
+.rotation-track{
+  position:absolute;
+
+  top:347px;
+  left:0;
+
+  width:78%;
+  height:11px;
+
+  overflow:hidden;
+
+  border-radius:999px;
+
+  background:#8b8b8b;
+}
+
+.rotation-track > div{
+  width:0;
+  height:100%;
+
+  border-radius:999px;
+
+  background:var(--yellow);
+}
+
+.rotation-track > div.run{
+  animation-name:rotationFill;
+  animation-timing-function:linear;
+  animation-fill-mode:forwards;
+}
+
+@keyframes rotationFill{
+  from{
+    width:0;
+  }
+
+  to{
+    width:100%;
+  }
+}
+
+.hit-counter{
+  position:absolute;
+
+  top:366px;
+  left:0;
+
+  width:100%;
+  height:32px;
+
+  display:flex;
+  align-items:center;
+
+  color:#fff;
+
+  font-size:21px;
+  line-height:21px;
+
+  font-weight:900;
+}
+
+
+/* =====================================================
+   CONNECTION STATUS
+   ===================================================== */
+
+.connection-status{
+  position:absolute;
+
+  right:42px;
+  bottom:12px;
+
+  display:flex;
+  align-items:center;
+  gap:7px;
+
+  color:#626262;
+
+  font-size:10px;
 }
 
 .connection-dot{
-  width:8px;
-  height:8px;
+  width:7px;
+  height:7px;
 
   border-radius:50%;
+
   background:#777;
 }
 
 .connection-dot.live{
   background:var(--green);
-  box-shadow:0 0 8px var(--green);
+
+  box-shadow:
+    0 0 8px var(--green);
 }
 
 .connection-dot.error{
   background:var(--red);
-  box-shadow:0 0 8px var(--red);
+
+  box-shadow:
+    0 0 8px var(--red);
 }
 
-.divider{
+.separator{
   color:#555;
 }
 
-/* CELEBRATION */
+
+/* =====================================================
+   EMPTY STATE
+   Keep geometry intact.
+   ===================================================== */
+
+.empty-featured .card-frame{
+  visibility:hidden;
+}
+
+
+/* =====================================================
+   CELEBRATION
+   ===================================================== */
+
 .celebration{
   position:fixed;
+
   inset:0;
+
   z-index:999;
 
   display:grid;
   place-items:center;
 
-  background:rgba(0,0,0,.94);
+  background:rgba(0,0,0,.95);
 }
 
 .celebration[hidden]{
@@ -543,184 +571,212 @@ h1{
 
 .celebration::before{
   content:"";
+
   position:absolute;
+
   inset:0;
 
   background:
-    radial-gradient(circle at center,rgba(255,212,0,.18),transparent 48%);
+    radial-gradient(
+      circle at center,
+      rgba(255,212,0,.18),
+      transparent 50%
+    );
 }
 
-.celebration-box{
+.celebration-card{
   position:relative;
+
   z-index:2;
 
-  width:min(700px,88vw);
+  width:min(700px,90vw);
 
   text-align:center;
 }
 
-.jackpot{
+.celebration-kicker{
   margin-bottom:12px;
 
   color:var(--yellow);
 
-  font-size:clamp(42px,6vw,90px);
+  font-size:74px;
+  line-height:1;
+
   font-weight:900;
-  letter-spacing:-.05em;
 }
 
-.celebration-box img{
-  max-width:48vw;
-  max-height:55vh;
+.celebration-card img{
+  max-width:50vw;
+  max-height:54vh;
 
   object-fit:contain;
 
-  filter:drop-shadow(0 18px 35px rgba(0,0,0,.55));
+  filter:
+    drop-shadow(0 18px 36px rgba(0,0,0,.65));
 }
 
-.celebration-box h2{
+.celebration-card h2{
   margin:12px 0 0;
 
-  font-size:clamp(38px,5vw,72px);
+  color:#fff;
+
+  font-size:55px;
   line-height:1;
+
+  font-weight:900;
 }
 
 .celebration-value{
-  margin-top:8px;
+  margin-top:7px;
 
   color:var(--yellow);
 
-  font-size:clamp(26px,3vw,44px);
+  font-size:38px;
+
   font-weight:900;
 }
 
-.celebration-box p{
-  margin:12px 0;
+.celebration-card p{
+  margin:10px 0;
 
-  font-size:clamp(22px,2.2vw,34px);
+  color:#fff;
+
+  font-size:28px;
+
   font-weight:800;
 }
 
-.celebration-box small{
+.celebration-card small{
   color:var(--yellow);
+
   font-weight:900;
+
   letter-spacing:.16em;
 }
 
-/* Empty state keeps the same geometry */
-.empty-featured .featured-image-wrap{
-  visibility:hidden;
-}
 
-/*
-  FALLBACK FOR SMALLER MONITORS
-  Still uses fixed independent zones.
-*/
+/* =====================================================
+   TV / SMALLER 1080p WINDOW FALLBACK
+   Still uses locked absolute rectangles.
+   ===================================================== */
+
 @media (max-width:1200px){
 
-  .stream-header{
-    height:92px;
-    padding:14px 20px 12px;
+  .topbar{
+    height:94px;
+
+    padding:14px 20px;
+  }
+
+  .brand-mark{
+    width:52px;
+    height:52px;
+
+    flex-basis:52px;
+
+    font-size:20px;
+  }
+
+  .eyebrow{
+    font-size:11px;
   }
 
   h1{
-    font-size:46px;
+    font-size:43px;
   }
 
-  .logo{
-    width:54px;
-    height:54px;
-    font-size:21px;
+  .card-area{
+    top:116px;
+    left:22px;
+
+    width:42%;
+    height:calc(100vh - 150px);
   }
 
-  .card-zone{
-    left:24px;
-    top:122px;
+  .guarantee-area{
+    top:120px;
+    right:26px;
 
-    width:42vw;
-    height:calc(100vh - 122px - 155px);
-
-    min-width:0;
+    width:50%;
+    height:185px;
   }
 
-  .guarantee-zone{
-    top:122px;
-    right:28px;
+  .guarantee-box{
+    height:178px;
 
-    width:50vw;
-    height:190px;
-  }
+    padding:14px 22px;
 
-  .guarantee-card{
-    height:175px;
-    padding:15px 22px;
     border-radius:20px;
   }
 
-  .guarantee-main{
-    font-size:46px;
-    line-height:.93;
+  .guarantee-line{
+    height:48px;
+
+    font-size:47px;
+    line-height:47px;
   }
 
-  .guarantee-sub{
-    font-size:28px;
+  .guarantee-small{
+    height:34px;
+
+    font-size:29px;
+    line-height:29px;
   }
 
-  .info-zone{
-    top:325px;
-    right:28px;
+  .hit-area{
+    top:320px;
+    right:26px;
 
-    width:50vw;
-    height:calc(100vh - 325px - 155px);
+    width:50%;
+    height:calc(100vh - 345px);
   }
 
   .featured-label{
-    height:32px;
-    font-size:23px;
-    line-height:23px;
+    height:28px;
+
+    font-size:22px;
+    line-height:22px;
   }
 
   #featuredName{
-    height:160px;
+    top:35px;
 
-    font-size:58px;
+    height:165px;
+
+    font-size:56px;
   }
 
   .featured-number{
-    height:38px;
+    top:204px;
 
-    font-size:28px;
-    line-height:28px;
+    height:36px;
+
+    font-size:25px;
   }
 
   .featured-value{
-    height:42px;
+    top:240px;
 
-    font-size:34px;
-    line-height:34px;
+    height:39px;
+
+    font-size:31px;
+  }
+
+  .rotation-track{
+    top:286px;
+
+    height:9px;
   }
 
   .hit-counter{
+    top:302px;
+
     height:28px;
 
-    font-size:20px;
-    line-height:20px;
+    font-size:18px;
   }
 
-  .bottom-bar{
-    left:18px;
-    right:18px;
-    bottom:28px;
-
-    height:98px;
-  }
-
-  .bottom-item{
-    height:98px;
-  }
-
-  .bottom-item strong{
-    font-size:40px;
-    line-height:40px;
+  .connection-status{
+    right:26px;
   }
 }
