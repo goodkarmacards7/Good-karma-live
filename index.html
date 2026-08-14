@@ -1,726 +1,154 @@
-:root{
-  --black:#070707;
-  --white:#ffffff;
-  --muted:#b9b9b9;
-  --yellow:#ffd400;
-  --green:#3de58a;
-  --red:#ff3b30;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-html,
-body{
-  width:100%;
-  height:100%;
-  margin:0;
-}
-
-body{
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 12% 15%,rgba(255,212,0,.10),transparent 28%),
-    radial-gradient(circle at 86% 84%,rgba(255,212,0,.06),transparent 30%),
-    var(--black);
-  color:var(--white);
-  font-family:Inter,Arial,sans-serif;
-}
-
-/*
-  LOCKED VIEWPORT LAYOUT
-  Nothing in the rotating card content is allowed to move the guarantee.
-*/
-.stream-display{
-  position:relative;
-  width:100vw;
-  height:100vh;
-  overflow:hidden;
-}
-
-/* HEADER */
-.stream-header{
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  height:110px;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  padding:20px 28px 16px;
-  border-bottom:4px solid var(--yellow);
-}
-
-.brand-lockup{
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.logo{
-  width:64px;
-  height:64px;
-  border-radius:15px;
-  display:grid;
-  place-items:center;
-  flex:0 0 auto;
-
-  background:var(--yellow);
-  color:#000;
-  font-size:25px;
-  font-weight:900;
-}
-
-.eyebrow{
-  color:var(--yellow);
-  font-size:14px;
-  font-weight:900;
-  letter-spacing:.18em;
-}
-
-h1{
-  margin:3px 0 0;
-  font-size:56px;
-  line-height:.95;
-  letter-spacing:-.045em;
-}
-
-.live-pill{
-  display:flex;
-  align-items:center;
-  gap:8px;
-
-  padding:10px 15px;
-  border:2px solid #666;
-  border-radius:999px;
-
-  font-size:15px;
-  font-weight:900;
-}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Good Karma Cards | Live Good Karma Pulls</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css?v=locked-v2-0813">
+</head>
+
+<body>
+  <main class="stream-display">
+
+    <header class="stream-header">
+      <div class="brand-lockup">
+        <div class="logo">GK</div>
+
+        <div>
+          <div class="eyebrow">GOOD KARMA CARDS</div>
+          <h1>GOOD KARMA PULLS</h1>
+        </div>
+      </div>
+
+      <div class="live-pill">
+        <span class="live-dot"></span>
+        LIVE
+      </div>
+    </header>
+
+    <section class="card-zone">
+      <div class="featured-image-wrap">
+        <img
+          id="featuredImage"
+          class="featured-image"
+          alt="Featured premium hit"
+        >
+        <div id="featuredTier" class="tier-badge"></div>
+      </div>
+    </section>
+
+    <section class="guarantee-zone">
+      <div class="guarantee-card">
+        <div class="guarantee-main">GUARANTEED</div>
+        <div class="guarantee-main">IR OR BETTER</div>
+        <div class="guarantee-sub">IN EVERY PACK</div>
+      </div>
+    </section>
+
+    <section class="info-zone">
+      <div class="featured-label">FEATURED HIT</div>
+
+      <h2 id="featuredName">
+        Loading premium hits...
+      </h2>
+
+      <div
+        id="featuredNumber"
+        class="featured-number"
+      ></div>
+
+      <div
+        id="featuredValue"
+        class="featured-value"
+      ></div>
+
+      <div class="rotation-progress">
+        <div id="rotationProgress"></div>
+      </div>
+
+      <div
+        id="hitCounter"
+        class="hit-counter"
+      ></div>
+    </section>
+
+    <footer class="bottom-bar">
+
+      <div class="bottom-item">
+        <span class="bottom-label">PRICE</span>
+        <strong>$12</strong>
+        <small>PER PULL</small>
+      </div>
+
+      <div class="bottom-item">
+        <span class="bottom-label">PICK</span>
+        <strong>A • B • C</strong>
+        <small>YOUR PULL</small>
+      </div>
+
+      <div class="bottom-item">
+        <span class="bottom-label">PACKS LEFT</span>
+        <strong id="packsRemaining">0</strong>
+        <small>LIVE</small>
+      </div>
+
+    </footer>
+
+    <div class="status-line">
+      <span
+        id="connectionDot"
+        class="connection-dot"
+      ></span>
 
-.live-dot{
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:var(--green);
-  box-shadow:0 0 13px var(--green);
-}
+      <span id="connectionText">
+        Connecting...
+      </span>
 
-/*
-  LEFT CARD ZONE
-  Fixed rectangle. Card changes never alter any other zone.
-*/
-.card-zone{
-  position:absolute;
-
-  left:42px;
-  top:145px;
+      <span class="divider">•</span>
 
-  width:43vw;
-  height:calc(100vh - 145px - 175px);
+      <span id="lastUpdated"></span>
+    </div>
 
-  min-width:420px;
+  </main>
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+  <div
+    id="celebration"
+    class="celebration"
+    hidden
+  >
+    <div class="celebration-box">
 
-.featured-image-wrap{
-  position:relative;
+      <div class="jackpot">
+        BIG HIT!
+      </div>
 
-  width:100%;
-  height:100%;
+      <img
+        id="celebrationImage"
+        alt=""
+      >
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+      <h2 id="celebrationName"></h2>
 
-.featured-image{
-  width:100%;
-  height:100%;
+      <div
+        id="celebrationValue"
+        class="celebration-value"
+      ></div>
 
-  max-width:620px;
-  max-height:100%;
+      <p id="celebrationWinner"></p>
 
-  object-fit:contain;
+      <small>
+        GOOD KARMA CARDS
+      </small>
 
-  filter:
-    drop-shadow(0 16px 30px rgba(0,0,0,.55))
-    drop-shadow(0 0 18px rgba(255,212,0,.08));
+    </div>
+  </div>
 
-  transition:
-    opacity .18s ease,
-    transform .18s ease;
-}
-
-.featured-image.changing{
-  opacity:.15;
-  transform:scale(.975);
-}
-
-.tier-badge{
-  position:absolute;
-
-  top:18px;
-  left:18px;
-
-  max-width:90%;
-
-  padding:8px 12px;
-
-  border:2px solid var(--yellow);
-  border-radius:999px;
-
-  background:rgba(0,0,0,.86);
-  color:var(--yellow);
-
-  font-size:18px;
-  font-weight:900;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-}
-
-.tier-badge:empty{
-  display:none;
-}
-
-/*
-  RIGHT TOP GUARANTEE
-  This is now a completely independent fixed rectangle.
-*/
-.guarantee-zone{
-  position:absolute;
-
-  top:145px;
-  right:46px;
-
-  width:48vw;
-  height:225px;
-
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
-}
-
-.guarantee-card{
-  width:100%;
-  height:205px;
-
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  justify-content:center;
-
-  padding:18px 28px 16px;
-
-  background:var(--yellow);
-  border:4px solid #f8f8f8;
-  border-radius:24px;
-
-  box-shadow:
-    0 0 0 3px rgba(0,0,0,.75),
-    0 0 24px rgba(255,212,0,.28);
-
-  transform:none;
-}
-
-.guarantee-main{
-  width:100%;
-  margin:0;
-
-  color:#050505;
-
-  font-size:58px;
-  line-height:.92;
-  font-weight:900;
-  letter-spacing:-2px;
-
-  text-align:left;
-  white-space:nowrap;
-}
-
-.guarantee-sub{
-  width:100%;
-  margin-top:11px;
-
-  color:#111;
-
-  font-size:34px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:-1px;
-
-  text-align:left;
-  white-space:nowrap;
-}
-
-/*
-  RIGHT BOTTOM HIT INFO
-  Fixed rectangle beneath guarantee.
-*/
-.info-zone{
-  position:absolute;
-
-  top:390px;
-  right:46px;
-
-  width:48vw;
-  height:calc(100vh - 390px - 175px);
-
-  min-height:260px;
-
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  justify-content:flex-start;
-
-  padding:0;
-  overflow:hidden;
-}
-
-.featured-label{
-  width:100%;
-  height:38px;
-
-  display:flex;
-  align-items:center;
-
-  margin:0 0 8px;
-
-  color:var(--yellow);
-
-  font-size:28px;
-  line-height:28px;
-  font-weight:900;
-  letter-spacing:.08em;
-
-  text-align:left;
-}
-
-/*
-  Fixed name box.
-  Long names wrap INSIDE this box.
-  Nothing above or below can move.
-*/
-#featuredName{
-  width:100%;
-  height:205px;
-
-  margin:0;
-
-  display:flex;
-  align-items:flex-start;
-  justify-content:flex-start;
-
-  overflow:hidden;
-
-  color:var(--white);
-
-  font-size:72px;
-  line-height:.98;
-  font-weight:900;
-  letter-spacing:-.055em;
-
-  text-align:left;
-  overflow-wrap:anywhere;
-}
-
-.featured-number{
-  width:100%;
-  height:46px;
-
-  display:flex;
-  align-items:center;
-
-  margin:0;
-
-  color:var(--muted);
-
-  font-size:34px;
-  line-height:34px;
-  font-weight:800;
-}
-
-.featured-value{
-  width:100%;
-  height:50px;
-
-  display:flex;
-  align-items:center;
-
-  margin:0;
-
-  color:var(--yellow);
-
-  font-size:42px;
-  line-height:42px;
-  font-weight:900;
-}
-
-.rotation-progress{
-  width:82%;
-  height:12px;
-
-  margin-top:8px;
-
-  overflow:hidden;
-
-  background:#858585;
-  border-radius:999px;
-}
-
-.rotation-progress > div{
-  width:0;
-  height:100%;
-  background:var(--yellow);
-  border-radius:999px;
-}
-
-.rotation-progress > div.run{
-  animation-name:rotationFill;
-  animation-timing-function:linear;
-  animation-fill-mode:forwards;
-}
-
-@keyframes rotationFill{
-  from{width:0}
-  to{width:100%}
-}
-
-.hit-counter{
-  width:100%;
-  height:34px;
-
-  display:flex;
-  align-items:center;
-
-  margin-top:8px;
-
-  color:var(--white);
-
-  font-size:24px;
-  line-height:24px;
-  font-weight:900;
-}
-
-/* FIXED BOTTOM BAR */
-.bottom-bar{
-  position:absolute;
-
-  left:28px;
-  right:28px;
-  bottom:32px;
-
-  height:118px;
-
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
-
-.bottom-item{
-  height:118px;
-
-  display:grid;
-  grid-template-columns:auto 1fr;
-  grid-template-rows:1fr 1fr;
-
-  column-gap:14px;
-  align-items:center;
-
-  padding:14px 18px;
-
-  background:linear-gradient(180deg,#1a1a1a,#101010);
-
-  border:2px solid #383838;
-  border-radius:17px;
-}
-
-.bottom-label{
-  grid-column:1;
-  grid-row:1 / span 2;
-
-  color:var(--yellow);
-
-  font-size:13px;
-  font-weight:900;
-  letter-spacing:.13em;
-
-  writing-mode:vertical-rl;
-  transform:rotate(180deg);
-}
-
-.bottom-item strong{
-  grid-column:2;
-  grid-row:1;
-
-  align-self:end;
-
-  color:var(--white);
-
-  font-size:48px;
-  line-height:48px;
-  font-weight:900;
-}
-
-.bottom-item small{
-  grid-column:2;
-  grid-row:2;
-
-  align-self:start;
-
-  margin-top:5px;
-
-  color:var(--muted);
-
-  font-size:13px;
-  font-weight:800;
-  letter-spacing:.10em;
-}
-
-/* STATUS */
-.status-line{
-  position:absolute;
-
-  left:0;
-  right:0;
-  bottom:8px;
-
-  height:18px;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:8px;
-
-  color:#777;
-  font-size:11px;
-}
-
-.connection-dot{
-  width:8px;
-  height:8px;
-
-  border-radius:50%;
-  background:#777;
-}
-
-.connection-dot.live{
-  background:var(--green);
-  box-shadow:0 0 8px var(--green);
-}
-
-.connection-dot.error{
-  background:var(--red);
-  box-shadow:0 0 8px var(--red);
-}
-
-.divider{
-  color:#555;
-}
-
-/* CELEBRATION */
-.celebration{
-  position:fixed;
-  inset:0;
-  z-index:999;
-
-  display:grid;
-  place-items:center;
-
-  background:rgba(0,0,0,.94);
-}
-
-.celebration[hidden]{
-  display:none;
-}
-
-.celebration::before{
-  content:"";
-  position:absolute;
-  inset:0;
-
-  background:
-    radial-gradient(circle at center,rgba(255,212,0,.18),transparent 48%);
-}
-
-.celebration-box{
-  position:relative;
-  z-index:2;
-
-  width:min(700px,88vw);
-
-  text-align:center;
-}
-
-.jackpot{
-  margin-bottom:12px;
-
-  color:var(--yellow);
-
-  font-size:clamp(42px,6vw,90px);
-  font-weight:900;
-  letter-spacing:-.05em;
-}
-
-.celebration-box img{
-  max-width:48vw;
-  max-height:55vh;
-
-  object-fit:contain;
-
-  filter:drop-shadow(0 18px 35px rgba(0,0,0,.55));
-}
-
-.celebration-box h2{
-  margin:12px 0 0;
-
-  font-size:clamp(38px,5vw,72px);
-  line-height:1;
-}
-
-.celebration-value{
-  margin-top:8px;
-
-  color:var(--yellow);
-
-  font-size:clamp(26px,3vw,44px);
-  font-weight:900;
-}
-
-.celebration-box p{
-  margin:12px 0;
-
-  font-size:clamp(22px,2.2vw,34px);
-  font-weight:800;
-}
-
-.celebration-box small{
-  color:var(--yellow);
-  font-weight:900;
-  letter-spacing:.16em;
-}
-
-/* Empty state keeps the same geometry */
-.empty-featured .featured-image-wrap{
-  visibility:hidden;
-}
-
-/*
-  FALLBACK FOR SMALLER MONITORS
-  Still uses fixed independent zones.
-*/
-@media (max-width:1200px){
-
-  .stream-header{
-    height:92px;
-    padding:14px 20px 12px;
-  }
-
-  h1{
-    font-size:46px;
-  }
-
-  .logo{
-    width:54px;
-    height:54px;
-    font-size:21px;
-  }
-
-  .card-zone{
-    left:24px;
-    top:122px;
-
-    width:42vw;
-    height:calc(100vh - 122px - 155px);
-
-    min-width:0;
-  }
-
-  .guarantee-zone{
-    top:122px;
-    right:28px;
-
-    width:50vw;
-    height:190px;
-  }
-
-  .guarantee-card{
-    height:175px;
-    padding:15px 22px;
-    border-radius:20px;
-  }
-
-  .guarantee-main{
-    font-size:46px;
-    line-height:.93;
-  }
-
-  .guarantee-sub{
-    font-size:28px;
-  }
-
-  .info-zone{
-    top:325px;
-    right:28px;
-
-    width:50vw;
-    height:calc(100vh - 325px - 155px);
-  }
-
-  .featured-label{
-    height:32px;
-    font-size:23px;
-    line-height:23px;
-  }
-
-  #featuredName{
-    height:160px;
-
-    font-size:58px;
-  }
-
-  .featured-number{
-    height:38px;
-
-    font-size:28px;
-    line-height:28px;
-  }
-
-  .featured-value{
-    height:42px;
-
-    font-size:34px;
-    line-height:34px;
-  }
-
-  .hit-counter{
-    height:28px;
-
-    font-size:20px;
-    line-height:20px;
-  }
-
-  .bottom-bar{
-    left:18px;
-    right:18px;
-    bottom:28px;
-
-    height:98px;
-  }
-
-  .bottom-item{
-    height:98px;
-  }
-
-  .bottom-item strong{
-    font-size:40px;
-    line-height:40px;
-  }
-}
+  <script src="config.js?v=locked-v2-0813"></script>
+  <script src="app.js?v=locked-v2-0813"></script>
+</body>
+</html>
