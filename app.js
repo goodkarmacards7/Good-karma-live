@@ -8,7 +8,6 @@
     image: $("featuredImage"),
     name: $("featuredName"),
     number: $("featuredNumber"),
-    tier: $("featuredTier"),
     counter: $("hitCounter"),
     progress: $("rotationProgress"),
 
@@ -112,7 +111,6 @@
         "Premium hits coming up...";
 
       e.number.textContent = "";
-      e.tier.textContent = "";
       e.counter.textContent = "";
 
       e.image.removeAttribute("src");
@@ -173,9 +171,6 @@
 
       e.number.textContent =
         n(card[c.hitColumns.number]);
-
-      e.tier.textContent =
-        n(card[c.hitColumns.tier]);
 
       e.counter.textContent =
         `${featuredIndex + 1} OF ${featuredHits.length} HITS`;
