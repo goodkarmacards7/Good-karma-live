@@ -8,7 +8,6 @@
     image: $("featuredImage"),
     name: $("featuredName"),
     number: $("featuredNumber"),
-    value: $("featuredValue"),
     tier: $("featuredTier"),
     counter: $("hitCounter"),
     progress: $("rotationProgress"),
@@ -20,7 +19,6 @@
     celebration: $("celebration"),
     ci: $("celebrationImage"),
     cn: $("celebrationName"),
-    cv: $("celebrationValue"),
     cw: $("celebrationWinner")
   };
 
@@ -31,16 +29,13 @@
   let featuredIndex = 0;
   let currentFeaturedKey = "";
 
-  /*
-    Featured card changes every 4 seconds.
-  */
   const rotationSeconds = 4;
 
-  const n = value =>
-    String(value ?? "").trim();
+  const n = v =>
+    String(v ?? "").trim();
 
-  const lower = value =>
-    n(value).toLowerCase();
+  const lower = v =>
+    n(v).toLowerCase();
 
   const sold = card =>
     c.soldWords.some(
@@ -63,11 +58,10 @@
         lower(word)
     );
 
-  const money = value => {
-
+  const money = v => {
     const amount =
       parseFloat(
-        n(value).replace(/[^0-9.-]/g,"")
+        n(v).replace(/[^0-9.-]/g,"")
       );
 
     return Number.isFinite(amount)
@@ -76,7 +70,12 @@
   };
 
   const key = card =>
-    `${n(card[c.hitColumns.name])}|${n(card[c.hitColumns.number])}`;
+    [
+      n(card[c.hitColumns.name]),
+      n(card[c.hitColumns.number]),
+      n(card[c.hitColumns.image]),
+      n(card[c.hitColumns.value])
+    ].join("|");
 
 
   function connection(ok,message){
@@ -91,6 +90,10 @@
 
   function restartProgress(){
 
+    if(!e.progress){
+      return;
+    }
+
     e.progress.classList.remove("run");
 
     void e.progress.offsetWidth;
@@ -102,9 +105,9 @@
   }
 
 
-  function showFeatured(animate=true){
+  function displayFeatured(card,animate=true){
 
-    if(!featuredHits.length){
+    if(!card){
 
       document.body.classList.add(
         "empty-featured"
@@ -114,11 +117,14 @@
         "Premium hits coming up...";
 
       e.number.textContent = "";
-      e.value.textContent = "";
       e.tier.textContent = "";
       e.counter.textContent = "";
 
       e.image.removeAttribute("src");
+
+      currentFeaturedKey = "";
+
+      restartProgress();
 
       return;
     }
@@ -129,37 +135,44 @@
     );
 
 
-    featuredIndex =
-      Math.min(
-        featuredIndex,
-        featuredHits.length - 1
-      );
-
-
-    const card =
-      featuredHits[featuredIndex];
-
-
     currentFeaturedKey =
       key(card);
 
 
     const apply = () => {
 
-      e.image.src =
+      const imageUrl =
         n(card[c.hitColumns.image]);
+
+
+      if(imageUrl){
+
+        e.image.src =
+          imageUrl;
+
+      }else{
+
+        e.image.removeAttribute(
+          "src"
+        );
+      }
+
 
       e.image.alt =
         n(card[c.hitColumns.name]);
 
 
       e.image.onerror = () => {
-        e.image.style.opacity = .12;
+
+        e.image.style.opacity =
+          .12;
       };
 
 
       e.image.onload = () => {
-        e.image.style.opacity = "";
+
+        e.image.style.opacity =
+          "";
       };
 
 
@@ -170,10 +183,6 @@
 
       e.number.textContent =
         n(card[c.hitColumns.number]);
-
-
-      e.value.textContent =
-        n(card[c.hitColumns.value]);
 
 
       e.tier.textContent =
@@ -201,7 +210,7 @@
 
       setTimeout(
         apply,
-        180
+        160
       );
 
     }else{
@@ -213,9 +222,25 @@
 
   function rotateFeatured(){
 
-    if(featuredHits.length <= 1){
+    if(featuredHits.length === 0){
 
-      restartProgress();
+      displayFeatured(
+        null,
+        false
+      );
+
+      return;
+    }
+
+
+    if(featuredHits.length === 1){
+
+      featuredIndex = 0;
+
+      displayFeatured(
+        featuredHits[0],
+        false
+      );
 
       return;
     }
@@ -226,13 +251,16 @@
       featuredHits.length;
 
 
-    showFeatured(true);
+    displayFeatured(
+      featuredHits[featuredIndex],
+      true
+    );
   }
 
 
-  function render(){
+  function updateFeaturedList(){
 
-    const previousKey =
+    const oldKey =
       currentFeaturedKey;
 
 
@@ -250,37 +278,56 @@
         );
 
 
-    if(previousKey){
+    if(featuredHits.length === 0){
 
-      const stillHere =
+      featuredIndex = 0;
+
+      displayFeatured(
+        null,
+        false
+      );
+
+      return;
+    }
+
+
+    if(oldKey){
+
+      const existingIndex =
         featuredHits.findIndex(
           card =>
-            key(card) === previousKey
+            key(card) === oldKey
         );
 
 
-      if(stillHere >= 0){
+      if(existingIndex >= 0){
 
         featuredIndex =
-          stillHere;
+          existingIndex;
 
-      }else{
 
-        featuredIndex =
-          featuredIndex %
-          Math.max(
-            featuredHits.length,
-            1
-          );
+        e.counter.textContent =
+          `${featuredIndex + 1} OF ${featuredHits.length} PREMIUM HITS LEFT`;
+
+
+        return;
       }
+    }
 
-    }else{
+
+    if(
+      featuredIndex >=
+      featuredHits.length
+    ){
 
       featuredIndex = 0;
     }
 
 
-    showFeatured(false);
+    displayFeatured(
+      featuredHits[featuredIndex],
+      false
+    );
   }
 
 
@@ -293,13 +340,6 @@
     e.cn.textContent =
       n(card[c.hitColumns.name]) ||
       "BIG HIT!";
-
-
-    if(e.cv){
-
-      e.cv.textContent =
-        n(card[c.hitColumns.value]);
-    }
 
 
     if(e.cw){
@@ -327,7 +367,10 @@
 
     setTimeout(
       () => {
-        e.celebration.hidden = true;
+
+        e.celebration.hidden =
+          true;
+
       },
       (
         Number(c.celebrationSeconds) ||
@@ -492,7 +535,7 @@
       );
 
 
-      render();
+      updateFeaturedList();
 
 
       first =
@@ -530,12 +573,13 @@
   }
 
 
-  /*
-    Fetch fresh Google Sheet data every 2 seconds.
-  */
   refresh();
 
 
+  /*
+    Sheet refresh every 2 seconds.
+    This does NOT reset the featured card.
+  */
   setInterval(
     refresh,
     Math.max(
@@ -547,7 +591,7 @@
 
 
   /*
-    Rotate featured card every 4 seconds.
+    Featured hit rotation every 4 seconds.
   */
   setInterval(
     rotateFeatured,
