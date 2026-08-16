@@ -70,6 +70,7 @@
   };
 
   const key = card =>
+    card.__gkRowId ||
     [
       n(card[c.hitColumns.name]),
       n(card[c.hitColumns.number]),
@@ -150,6 +151,20 @@
 
       e.image.onload = () => {
         e.image.style.opacity = "";
+
+        const ratio =
+          e.image.naturalWidth /
+          Math.max(e.image.naturalHeight, 1);
+
+        e.image.classList.toggle(
+          "is-slab",
+          ratio < 0.64
+        );
+
+        e.image.classList.toggle(
+          "is-raw",
+          ratio >= 0.64
+        );
       };
 
       e.name.textContent =
@@ -409,9 +424,12 @@
       );
 
     return payload.table.rows.map(
-      row => {
+      (row,rowIndex) => {
 
-        const item = {};
+        const item = {
+          __gkRowId:
+            `${gid}:${rowIndex}`
+        };
 
         headers.forEach(
           (header,index) => {
