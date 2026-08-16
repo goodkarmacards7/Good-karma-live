@@ -77,9 +77,7 @@
       n(card[c.hitColumns.value])
     ].join("|");
 
-
   function connection(ok,message){
-
     e.dot.className =
       `connection-dot ${ok ? "live" : "error"}`;
 
@@ -87,15 +85,12 @@
       message;
   }
 
-
   function restartProgress(){
-
     if(!e.progress){
       return;
     }
 
     e.progress.classList.remove("run");
-
     void e.progress.offsetWidth;
 
     e.progress.style.animationDuration =
@@ -103,7 +98,6 @@
 
     e.progress.classList.add("run");
   }
-
 
   function displayFeatured(card,animate=true){
 
@@ -129,78 +123,54 @@
       return;
     }
 
-
     document.body.classList.remove(
       "empty-featured"
     );
 
-
     currentFeaturedKey =
       key(card);
-
 
     const apply = () => {
 
       const imageUrl =
         n(card[c.hitColumns.image]);
 
-
       if(imageUrl){
-
-        e.image.src =
-          imageUrl;
-
+        e.image.src = imageUrl;
       }else{
-
-        e.image.removeAttribute(
-          "src"
-        );
+        e.image.removeAttribute("src");
       }
-
 
       e.image.alt =
         n(card[c.hitColumns.name]);
 
-
       e.image.onerror = () => {
-
-        e.image.style.opacity =
-          .12;
+        e.image.style.opacity = .12;
       };
-
 
       e.image.onload = () => {
-
-        e.image.style.opacity =
-          "";
+        e.image.style.opacity = "";
       };
-
 
       e.name.textContent =
         n(card[c.hitColumns.name]) ||
         "Premium Hit";
 
-
       e.number.textContent =
         n(card[c.hitColumns.number]);
-
 
       e.tier.textContent =
         n(card[c.hitColumns.tier]);
 
-
       e.counter.textContent =
-        `${featuredIndex + 1} OF ${featuredHits.length} PREMIUM HITS LEFT`;
-
+        `${featuredIndex + 1} OF ${featuredHits.length} HITS`;
 
       e.image.classList.remove(
         "changing"
       );
 
-
       restartProgress();
     };
-
 
     if(animate){
 
@@ -214,11 +184,9 @@
       );
 
     }else{
-
       apply();
     }
   }
-
 
   function rotateFeatured(){
 
@@ -232,7 +200,6 @@
       return;
     }
 
-
     if(featuredHits.length === 1){
 
       featuredIndex = 0;
@@ -245,11 +212,9 @@
       return;
     }
 
-
     featuredIndex =
       (featuredIndex + 1) %
       featuredHits.length;
-
 
     displayFeatured(
       featuredHits[featuredIndex],
@@ -257,12 +222,10 @@
     );
   }
 
-
   function updateFeaturedList(){
 
     const oldKey =
       currentFeaturedKey;
-
 
     featuredHits =
       hits
@@ -277,7 +240,6 @@
             money(a[c.hitColumns.value])
         );
 
-
     if(featuredHits.length === 0){
 
       featuredIndex = 0;
@@ -290,7 +252,6 @@
       return;
     }
 
-
     if(oldKey){
 
       const existingIndex =
@@ -299,30 +260,21 @@
             key(card) === oldKey
         );
 
-
       if(existingIndex >= 0){
 
         featuredIndex =
           existingIndex;
 
-
         e.counter.textContent =
-          `${featuredIndex + 1} OF ${featuredHits.length} PREMIUM HITS LEFT`;
-
+          `${featuredIndex + 1} OF ${featuredHits.length} HITS`;
 
         return;
       }
     }
 
-
-    if(
-      featuredIndex >=
-      featuredHits.length
-    ){
-
+    if(featuredIndex >= featuredHits.length){
       featuredIndex = 0;
     }
-
 
     displayFeatured(
       featuredHits[featuredIndex],
@@ -330,29 +282,24 @@
     );
   }
 
-
   function showCelebration(card){
 
     e.ci.src =
       n(card[c.hitColumns.image]);
 
-
     e.cn.textContent =
       n(card[c.hitColumns.name]) ||
       "BIG HIT!";
-
 
     if(e.cw){
 
       const winnerColumn =
         c.hitColumns.winner;
 
-
       const winner =
         winnerColumn
           ? n(card[winnerColumn])
           : "";
-
 
       e.cw.textContent =
         winner
@@ -360,17 +307,13 @@
           : "Congratulations!";
     }
 
-
     e.celebration.hidden =
       false;
 
-
     setTimeout(
       () => {
-
         e.celebration.hidden =
           true;
-
       },
       (
         Number(c.celebrationSeconds) ||
@@ -379,13 +322,11 @@
     );
   }
 
-
   function detect(previous,current){
 
     if(first){
       return;
     }
-
 
     const previouslySold =
       new Set(
@@ -393,7 +334,6 @@
           .filter(sold)
           .map(key)
       );
-
 
     const newCelebrations =
       current.filter(
@@ -405,7 +345,6 @@
           )
       );
 
-
     if(newCelebrations.length){
 
       showCelebration(
@@ -413,7 +352,6 @@
       );
     }
   }
-
 
   async function fetchSheet(gid){
 
@@ -424,7 +362,6 @@
       `&tq=${encodeURIComponent("select *")}` +
       `&cacheBust=${Date.now()}`;
 
-
     const response =
       await fetch(
         url,
@@ -433,7 +370,6 @@
         }
       );
 
-
     if(!response.ok){
 
       throw Error(
@@ -441,18 +377,14 @@
       );
     }
 
-
     const text =
       await response.text();
-
 
     const start =
       text.indexOf("{");
 
-
     const end =
       text.lastIndexOf("}");
-
 
     if(start < 0 || end < 0){
 
@@ -460,7 +392,6 @@
         "Google Sheet returned unreadable data."
       );
     }
-
 
     const payload =
       JSON.parse(
@@ -470,7 +401,6 @@
         )
       );
 
-
     const headers =
       payload.table.cols.map(
         (column,index) =>
@@ -478,19 +408,16 @@
           `Column ${index + 1}`
       );
 
-
     return payload.table.rows.map(
       row => {
 
         const item = {};
-
 
         headers.forEach(
           (header,index) => {
 
             const cell =
               row.c?.[index];
-
 
             item[header] =
               cell?.f ??
@@ -499,12 +426,10 @@
           }
         );
 
-
         return item;
       }
     );
   }
-
 
   async function refresh(){
 
@@ -513,12 +438,10 @@
       const previous =
         hits.slice();
 
-
       const rows =
         await fetchSheet(
           c.hitsGid
         );
-
 
       hits =
         rows.filter(
@@ -528,25 +451,20 @@
             )
         );
 
-
       detect(
         previous,
         hits
       );
 
-
       updateFeaturedList();
-
 
       first =
         false;
-
 
       connection(
         true,
         "Google Sheet live"
       );
-
 
       e.updated.textContent =
         `Updated ${new Date().toLocaleTimeString(
@@ -564,7 +482,6 @@
         error
       );
 
-
       connection(
         false,
         error.message
@@ -572,14 +489,8 @@
     }
   }
 
-
   refresh();
 
-
-  /*
-    Sheet refresh every 2 seconds.
-    This does NOT reset the featured card.
-  */
   setInterval(
     refresh,
     Math.max(
@@ -589,10 +500,6 @@
     ) * 1000
   );
 
-
-  /*
-    Featured hit rotation every 4 seconds.
-  */
   setInterval(
     rotateFeatured,
     rotationSeconds * 1000
