@@ -2,28 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Good Karma Pulls | Live</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800;900&family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="styles.css?v=no-price-rotation-1">
+  <link rel="stylesheet" href="styles.css?v=cosmic-live-1">
 </head>
 
 <body>
-
   <main class="live-page">
+
+    <div class="cosmic-grid"></div>
+    <div class="star star-a"></div>
+    <div class="star star-b"></div>
+    <div class="star star-c"></div>
+    <div class="star star-d"></div>
+
+    <div class="ornament-card ornament-left">
+      <div class="ornament-symbol">⚡</div>
+    </div>
+
+    <div class="ornament-card ornament-right">
+      <div class="ornament-symbol">✦</div>
+    </div>
 
     <header class="topbar">
       <div class="brand">
-        <div class="brand-mark">GK</div>
-
-        <div class="brand-copy">
-          <div class="eyebrow">GOOD KARMA CARDS</div>
-          <h1>GOOD KARMA PULLS</h1>
+        <div class="logo-shell">
+          <img src="good-karma-logo.png?v=cosmic-live-1" alt="Good Karma Cards">
         </div>
+        <h1>GOOD KARMA <span>PULLS</span></h1>
       </div>
 
       <div class="live-pill">
@@ -32,123 +43,84 @@
       </div>
     </header>
 
+    <section class="card-stage">
+      <div class="halo"></div>
 
-    <section class="card-area">
       <div class="card-frame">
-
         <img
           id="featuredImage"
           class="featured-image"
           alt="Featured premium hit"
         >
+        <div id="featuredTier" class="tier-badge"></div>
+      </div>
 
-        <div
-          id="featuredTier"
-          class="tier-badge"
-        ></div>
-
+      <div class="pedestal">
+        <div class="pedestal-ring ring-1"></div>
+        <div class="pedestal-ring ring-2"></div>
+        <div class="pedestal-ring ring-3"></div>
+        <div class="pedestal-glow"></div>
       </div>
     </section>
 
+    <section class="right-panel">
 
-    <section class="guarantee-area">
       <div class="guarantee-box">
+        <div class="guarantee-star">✦</div>
 
-        <div class="guarantee-line">
-          GUARANTEED
+        <div class="guarantee-main">GUARANTEED</div>
+        <div class="guarantee-main">IR OR BETTER</div>
+
+        <div class="guarantee-bottom">
+          <span></span>
+          <div>IN EVERY PACK</div>
+          <span></span>
         </div>
-
-        <div class="guarantee-line">
-          IR OR BETTER
-        </div>
-
-        <div class="guarantee-small">
-          IN EVERY PACK
-        </div>
-
-      </div>
-    </section>
-
-
-    <section class="hit-area">
-
-      <div class="featured-label">
-        FEATURED HIT
       </div>
 
-      <h2 id="featuredName">
-        Loading premium hits...
-      </h2>
+      <div class="featured-section">
 
-      <div
-        id="featuredNumber"
-        class="featured-number"
-      ></div>
+        <div class="featured-kicker">
+          <span>✦</span>
+          FEATURED HIT
+          <span>✦</span>
+        </div>
 
-      <div class="rotation-track">
-        <div id="rotationProgress"></div>
+        <h2 id="featuredName">Loading premium hits...</h2>
+
+        <div id="featuredNumber" class="featured-number"></div>
+
+        <div class="rotation-track">
+          <div id="rotationProgress"></div>
+          <div class="track-spark"></div>
+        </div>
+
+        <div id="hitCounter" class="hit-counter"></div>
+
       </div>
-
-      <div
-        id="hitCounter"
-        class="hit-counter"
-      ></div>
 
     </section>
-
 
     <div class="connection-status">
-
-      <span
-        id="connectionDot"
-        class="connection-dot"
-      ></span>
-
-      <span id="connectionText">
-        Connecting...
-      </span>
-
-      <span class="separator">•</span>
-
+      <span id="connectionDot" class="connection-dot"></span>
+      <span id="connectionText">Connecting...</span>
+      <span>•</span>
       <span id="lastUpdated"></span>
-
     </div>
 
   </main>
 
-
-  <div
-    id="celebration"
-    class="celebration"
-    hidden
-  >
-
+  <div id="celebration" class="celebration" hidden>
     <div class="celebration-card">
-
-      <div class="celebration-kicker">
-        BIG HIT!
-      </div>
-
-      <img
-        id="celebrationImage"
-        alt=""
-      >
-
+      <div class="celebration-kicker">BIG HIT!</div>
+      <img id="celebrationImage" alt="">
       <h2 id="celebrationName"></h2>
-
       <p id="celebrationWinner"></p>
-
-      <small>
-        GOOD KARMA CARDS
-      </small>
-
+      <small>GOOD KARMA PULLS</small>
     </div>
-
   </div>
 
-
-  <script src="config.js?v=no-price-rotation-1"></script>
-  <script src="app.js?v=no-price-rotation-1"></script>
-
+  <script src="config.js?v=cosmic-live-1"></script>
+  <script src="app.js?v=cosmic-live-1"></script>
 </body>
 </html>
